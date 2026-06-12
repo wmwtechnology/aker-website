@@ -262,6 +262,28 @@ function initContactForm() {
     });
   }
 
+  const kvkkLink = document.getElementById('kvkk-link');
+  const kvkkModal = document.getElementById('kvkk-modal');
+  const kvkkModalClose = document.getElementById('kvkk-modal-close');
+
+  if (kvkkLink && kvkkModal && kvkkModalClose) {
+    kvkkLink.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      kvkkModal.classList.add('active');
+    });
+
+    kvkkModalClose.addEventListener('click', function () {
+      kvkkModal.classList.remove('active');
+    });
+
+    kvkkModal.addEventListener('click', function (event) {
+      if (event.target === kvkkModal) {
+        kvkkModal.classList.remove('active');
+      }
+    });
+  }
+
   if (submitBtn) {
     submitBtn.addEventListener('click', function (event) {
       event.preventDefault();
