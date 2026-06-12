@@ -1,0 +1,425 @@
+/* =========================================================
+   AKER OSGB - Admin Panel Stilleri
+   ========================================================= */
+
+body.admin-body {
+  background-color: rgb(244, 245, 247);
+  min-height: 100%;
+}
+
+/* ---------------------------------------------------------
+   Giriş Ekranı
+   --------------------------------------------------------- */
+
+.admin-login {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.admin-login-box {
+  width: 100%;
+  max-width: 360px;
+  background: var(--color_surface_default);
+  border: 1px solid rgba(9, 23, 71, 0.1);
+  border-radius: 8px;
+  box-shadow: 0px 7px 30px -10px rgba(2, 5, 211, 0.15);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.admin-login-logo {
+  width: 140px;
+  margin-bottom: 20px;
+}
+
+.admin-login-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+.admin-login-box .admin-field {
+  width: 100%;
+}
+
+.admin-error {
+  color: var(--color_destructive_default);
+  font-size: 13px;
+  min-height: 18px;
+  margin: 4px 0 8px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------
+   Genel Form Elemanları
+   --------------------------------------------------------- */
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.admin-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(9, 23, 71, 0.8);
+  margin-bottom: 6px;
+}
+
+.admin-field input,
+.admin-field textarea {
+  width: 100%;
+  border: 1px solid rgba(9, 23, 71, 0.15);
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color_text_default);
+  padding: 10px;
+}
+
+.admin-field input {
+  height: 44px;
+}
+
+.admin-field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.admin-field input[type="file"] {
+  height: auto;
+  padding: 8px;
+  border: 1px dashed rgba(9, 23, 71, 0.25);
+  background-color: rgba(9, 23, 71, 0.02);
+}
+
+.admin-image-preview {
+  width: 100%;
+  max-height: 160px;
+  object-fit: contain;
+  border-radius: 5px;
+  background-color: rgba(9, 23, 71, 0.04);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.admin-image-preview-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  font-size: 13px;
+  color: rgba(9, 23, 71, 0.5);
+  border: 1px dashed rgba(9, 23, 71, 0.2);
+}
+
+.admin-btn-primary,
+.admin-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 12px 20px;
+  min-height: 44px;
+  cursor: pointer;
+  transition: background 200ms;
+}
+
+.admin-btn-primary {
+  width: 100%;
+  margin-top: 8px;
+  background-color: var(--color_primary_default);
+  color: var(--color_primary_contrast_default);
+  box-shadow: 0px 7px 30px -10px rgba(2, 5, 211, 0.3);
+}
+
+.admin-btn-primary:hover {
+  background-color: rgba(2, 5, 211, 0.85);
+}
+
+.admin-btn-secondary {
+  background-color: rgba(9, 23, 71, 0.06);
+  color: var(--color_text_default);
+}
+
+.admin-btn-secondary:hover {
+  background-color: rgba(9, 23, 71, 0.12);
+}
+
+/* ---------------------------------------------------------
+   Dashboard Düzeni
+   --------------------------------------------------------- */
+
+.admin-dashboard {
+  display: flex;
+  flex: 1;
+  min-height: 100%;
+}
+
+.admin-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background-color: rgb(24, 24, 40);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+}
+
+.admin-sidebar-logo {
+  padding: 0 8px 24px;
+}
+
+.admin-sidebar-logo img {
+  width: 100%;
+  max-width: 140px;
+  display: block;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.admin-nav-btn {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 12px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+
+.admin-nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.admin-nav-btn.active {
+  background-color: var(--color_primary_default);
+  color: #fff;
+}
+
+.admin-logout-btn,
+.admin-reset-btn {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 12px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-logout-btn:hover,
+.admin-reset-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 24px 32px 60px;
+  overflow-x: auto;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.admin-topbar h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+#add-btn {
+  width: auto;
+  margin-top: 0;
+}
+
+/* ---------------------------------------------------------
+   Tablo
+   --------------------------------------------------------- */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color_surface_default);
+  border: 1px solid rgba(9, 23, 71, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(9, 23, 71, 0.08);
+  vertical-align: middle;
+}
+
+.admin-table th {
+  background-color: rgba(9, 23, 71, 0.04);
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(9, 23, 71, 0.7);
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+  background-color: rgba(9, 23, 71, 0.05);
+}
+
+.admin-row-actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.admin-icon-btn {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 5px;
+  background-color: rgba(9, 23, 71, 0.06);
+  color: var(--color_text_default);
+  cursor: pointer;
+}
+
+.admin-icon-btn:hover {
+  background-color: rgba(9, 23, 71, 0.12);
+}
+
+.admin-icon-btn-danger {
+  background-color: rgba(255, 0, 0, 0.08);
+  color: var(--color_destructive_default);
+}
+
+.admin-icon-btn-danger:hover {
+  background-color: rgba(255, 0, 0, 0.16);
+}
+
+.admin-empty {
+  background-color: var(--color_surface_default);
+  border: 1px dashed rgba(9, 23, 71, 0.2);
+  border-radius: 6px;
+  padding: 40px;
+  text-align: center;
+  color: rgba(9, 23, 71, 0.6);
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------
+   Modal
+   --------------------------------------------------------- */
+
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(9, 23, 71, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.admin-modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--color_surface_default);
+  border-radius: 8px;
+  padding: 28px;
+}
+
+.admin-modal h2 {
+  font-size: 20px;
+  margin: 0 0 20px;
+}
+
+.admin-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.admin-modal-actions .admin-btn-primary,
+.admin-modal-actions .admin-btn-secondary {
+  flex: 1;
+  margin-top: 0;
+}
+
+.admin-detail-row {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.admin-detail-row strong {
+  display: inline-block;
+  min-width: 100px;
+}
+
+/* ---------------------------------------------------------
+   Responsive
+   --------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .admin-dashboard {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .admin-sidebar-logo {
+    padding: 0;
+    margin-right: auto;
+  }
+
+  .admin-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .admin-main {
+    padding: 20px;
+  }
+
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

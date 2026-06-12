@@ -1,0 +1,89 @@
+<html lang="tr" style="height: 100%;">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Yönetim Paneli | AKER OSGB</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:regular%7CInter:500%7CInter:700%7COpen+Sans:regular%7COpen+Sans:600%7COpen+Sans:700">
+<link rel="icon" type="image/png" href="https://6e2d58ea2e17ae467bdf1712f1ace591.cdn.bubble.io/cdn-cgi/image/w=128,h=,f=auto,dpr=1,fit=contain/f1723194062425x528427348987603000/Yeni%20Proje.png">
+
+<link type="text/css" href="css/style.css" rel="stylesheet">
+<link type="text/css" href="css/admin.css" rel="stylesheet">
+</head>
+<body class="admin-body" style="height: 100%; display: flex; flex-direction: column;">
+
+<!-- Giriş Ekranı -->
+<div class="admin-login" id="login-screen">
+  <div class="admin-login-box">
+    <div class="admin-login-logo"><img src="https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=192,h=76,f=auto,dpr=1.5,fit=contain/f1721898840738x195475059741890180/aker_osgb_cover-removebg-preview.png" alt="AKER OSGB"></div>
+    <div class="admin-login-title">Yönetim Paneli Girişi</div>
+    <div class="admin-field">
+      <label for="login-username">Kullanıcı Adı</label>
+      <input type="text" id="login-username" autocomplete="username">
+    </div>
+    <div class="admin-field">
+      <label for="login-password">Şifre</label>
+      <input type="password" id="login-password" autocomplete="current-password">
+    </div>
+    <div class="admin-error" id="login-error"></div>
+    <button class="admin-btn-primary" id="login-btn">Giriş Yap</button>
+  </div>
+</div>
+
+<!-- Yönetim Paneli -->
+<div class="admin-dashboard" id="admin-dashboard" style="display: none;">
+
+  <div class="admin-sidebar">
+    <div class="admin-sidebar-logo"><img src="https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=192,h=76,f=auto,dpr=1.5,fit=contain/f1721898840738x195475059741890180/aker_osgb_cover-removebg-preview.png" alt="AKER OSGB"></div>
+    <div class="admin-nav">
+      <button class="admin-nav-btn active" data-section="slides">Ana Sayfa Slider</button>
+      <button class="admin-nav-btn" data-section="clients">Referanslar</button>
+      <button class="admin-nav-btn" data-section="careers">Kariyer İlanları</button>
+      <button class="admin-nav-btn" data-section="documents">Belgelerimiz</button>
+      <button class="admin-nav-btn" data-section="news">Bizden Haberler</button>
+      <button class="admin-nav-btn" data-section="team">Ekibimiz</button>
+      <button class="admin-nav-btn" data-section="applications">Başvurular</button>
+    </div>
+    <button class="admin-reset-btn" id="reset-btn">Varsayılana Sıfırla</button>
+    <button class="admin-logout-btn" id="logout-btn">Çıkış Yap</button>
+  </div>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1 id="admin-section-title">Kariyer İlanları</h1>
+      <button class="admin-btn-primary" id="add-btn">+ Yeni Ekle</button>
+    </div>
+    <div id="admin-content"></div>
+  </div>
+
+</div>
+
+<!-- Ekle / Düzenle Modalı -->
+<div class="admin-modal-overlay" id="admin-modal" style="display: none;">
+  <div class="admin-modal">
+    <h2 id="modal-title">Yeni Ekle</h2>
+    <form id="admin-form"></form>
+    <div class="admin-modal-actions">
+      <button type="button" class="admin-btn-secondary" id="modal-cancel">Vazgeç</button>
+      <button type="button" class="admin-btn-primary" id="modal-save">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Başvuru Detay Modalı -->
+<div class="admin-modal-overlay" id="app-detail-modal" style="display: none;">
+  <div class="admin-modal">
+    <h2>Başvuru Detayı</h2>
+    <div id="app-detail-body"></div>
+    <div class="admin-modal-actions">
+      <button type="button" class="admin-btn-secondary" id="app-detail-close">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

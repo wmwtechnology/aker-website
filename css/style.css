@@ -1,0 +1,1234 @@
+/* =========================================================
+   AKER OSGB - Ana Stil Dosyası
+   ========================================================= */
+
+:root {
+  --font_default: "Open Sans";
+  --color_text_default: rgba(9, 23, 71, 1);
+  --color_alert_default: rgba(250, 181, 21, 1);
+  --color_primary_default: rgba(2, 5, 211, 1);
+  --color_success_default: rgba(23, 219, 78, 1);
+  --color_surface_default: rgba(255, 255, 255, 1);
+  --color_background_default: rgba(255, 255, 255, 1);
+  --color_destructive_default: rgba(255, 0, 0, 1);
+  --color_primary_contrast_default: rgba(255, 255, 255, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: var(--font_default), sans-serif;
+  color: var(--color_text_default);
+}
+
+html {
+  scroll-padding-top: 70px;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  max-width: 100%;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* =========================================================
+   Sayfa Düzeni
+   ========================================================= */
+
+.main-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  background-color: #ffffff;
+  position: relative;
+}
+
+/* =========================================================
+   WhatsApp Yüzen Buton
+   ========================================================= */
+
+.wpp-icon-wrapper {
+  align-self: flex-start;
+  width: 25px;
+  height: 25px;
+}
+
+.floating-wpp {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  font-size: 14px;
+  transition: bottom 0.2s;
+  z-index: 13;
+}
+
+.floating-wpp:hover {
+  bottom: 17px;
+}
+
+.floating-wpp-button {
+  display: block;
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 1px 1px 4px rgba(60, 60, 60, 0.4);
+  transition: box-shadow 0.2s;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.floating-wpp:hover .floating-wpp-button {
+  box-shadow: 1px 2px 8px rgba(60, 60, 60, 0.4);
+}
+
+.wpp-button-bg {
+  background-color: rgb(37, 211, 102);
+}
+
+.floating-wpp-button svg {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+/* =========================================================
+   Hero Slider
+   ========================================================= */
+
+.hero-swiper {
+  align-self: center;
+  width: 100%;
+  max-width: 1500px;
+  min-width: 200px;
+  height: 400px;
+  min-height: 400px;
+}
+
+.hero-swiper .swiper,
+.hero-swiper .swiper-slide {
+  width: 100%;
+  height: 100%;
+}
+
+.slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* =========================================================
+   Hakkımızda Bölümü
+   ========================================================= */
+
+.about-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 60px 20px 0;
+  margin-bottom: 40px;
+}
+
+.about-text-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 230px;
+  max-width: 600px;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: bold;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 18px;
+  font-weight: 400;
+  font-style: italic;
+  color: rgb(166, 188, 56);
+  line-height: 1.4;
+  padding-bottom: 20px;
+  margin: 0;
+  max-width: 400px;
+}
+
+.about-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  max-width: 700px;
+}
+
+.about-paragraph {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.about-html-embed {
+  width: 570px;
+  height: 360px;
+  max-width: 100%;
+}
+
+.about-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* =========================================================
+   Referans / Müşteri Logoları Slider
+   ========================================================= */
+
+.clients-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.clients-swiper {
+  width: 100%;
+  max-width: 1500px;
+  height: 100px;
+}
+
+.clients-swiper .swiper,
+.clients-swiper .swiper-slide {
+  height: 100%;
+}
+
+.client-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* =========================================================
+   Hizmetlerimiz Bölümü
+   ========================================================= */
+
+.services-section {
+  width: 100%;
+  padding: 65px 20px 0;
+}
+
+.services-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.services-title {
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.4;
+  padding-bottom: 40px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 1500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.service-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 56px;
+}
+
+.service-icon-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+}
+
+.service-icon {
+  align-self: center;
+  width: 70px;
+  margin-bottom: 10px;
+}
+
+.service-icon-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.service-label-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 300px;
+}
+
+.service-label {
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   Bizden Haberler Bölümü
+   ========================================================= */
+
+.news-section {
+  background-color: rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  row-gap: 8px;
+  width: 100%;
+  margin-top: 60px;
+  padding-bottom: 20px;
+  cursor: pointer;
+}
+
+.news-title {
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.4;
+  padding: 60px 0 40px;
+}
+
+.news-carousel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 1460px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 8px;
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  padding: 5px;
+  flex: none;
+}
+
+.nav-svg {
+  width: 100%;
+  height: 100%;
+  fill: currentcolor;
+}
+
+.news-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1100px;
+  margin-bottom: 45px;
+}
+
+.news-card {
+  width: 300px;
+  border-radius: 99px;
+}
+
+.news-card-shadow {
+  background-color: #fff;
+  box-shadow: 2px 2px 4px 0 rgb(133, 133, 133);
+  border-radius: 5px;
+}
+
+.news-card-image {
+  width: 100%;
+  height: 110px;
+  border-radius: 2px 2px 0 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.news-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 10px 15px;
+}
+
+.news-card-title {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.4;
+  padding-top: 15px;
+}
+
+.news-card-text {
+  font-size: 14px;
+  line-height: 1.4;
+  padding-top: 15px;
+}
+
+/* =========================================================
+   Banner
+   ========================================================= */
+
+.banner-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.banner-image {
+  width: 100%;
+  max-width: 1140px;
+  height: 240px;
+  margin: 50px 0 30px;
+}
+
+.banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* =========================================================
+   Belgelerimiz Bölümü
+   ========================================================= */
+
+.page-header-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 20px 0;
+}
+
+.page-header-title {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.page-header-subtitle {
+  font-size: 20px;
+  font-weight: 400;
+  color: rgb(82, 82, 91);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.documents-section {
+  width: 100%;
+  max-width: 1500px;
+  margin: 40px auto 60px;
+  padding: 0 20px;
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px;
+  background-color: rgb(249, 250, 251);
+  border: 1px solid rgba(9, 23, 71, 0.15);
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.document-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.document-title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.4;
+  padding: 30px 0 15px;
+}
+
+.document-image {
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 4px 4px 4px 0 rgb(170, 170, 170);
+}
+
+.document-img {
+  width: 100%;
+  display: block;
+}
+
+/* =========================================================
+   Ekibimiz Bölümü
+   ========================================================= */
+
+.team-section {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background-color: rgb(249, 250, 251);
+  border: 1px solid rgba(9, 23, 71, 0.15);
+}
+
+.team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 10px;
+  padding: 24px;
+}
+
+.team-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 100px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.team-name {
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(24, 24, 27);
+  letter-spacing: -0.36px;
+  line-height: 1.4;
+  text-align: center;
+  margin: 0;
+}
+
+.team-role {
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgb(94, 59, 238);
+  line-height: 1.4;
+  text-align: center;
+  margin: 0;
+}
+
+/* =========================================================
+   İş Başvurusu Bölümü
+   ========================================================= */
+
+.job-section {
+  width: 100%;
+  max-width: 700px;
+  margin: 40px auto 60px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.job-image {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 30px;
+}
+
+.job-image img {
+  width: 100%;
+  display: block;
+}
+
+.job-title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.4;
+  margin: 0 0 20px;
+}
+
+.job-text {
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.4;
+  color: var(--color_text_default);
+  margin: 0 0 40px;
+}
+
+.application-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 320px;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.file-input-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 200px;
+  height: 48px;
+  border: 1px solid rgba(9, 23, 71, 0.15);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.file-input-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: rgba(9, 23, 71, 0.36);
+  text-align: center;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.file-input-wrap input[type="file"] {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* =========================================================
+   İletişim Bölümü
+   ========================================================= */
+
+.contact-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 60px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.contact-form-block,
+.contact-info-block {
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  margin-top: 70px;
+}
+
+.contact-form-title-wrap,
+.contact-info-title-wrap {
+  margin: 10px 0;
+}
+
+.contact-form-title,
+.contact-info-title {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+.field-label {
+  font-size: 14px;
+  color: rgba(9, 23, 71, 0.8);
+  line-height: 1.4;
+}
+
+.field-input-wrap {
+  padding-bottom: 10px;
+}
+
+.field-input {
+  width: 100%;
+  height: 48px;
+  border: 1px solid rgba(9, 23, 71, 0.15);
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 6px;
+  color: var(--color_text_default);
+}
+
+.field-textarea {
+  width: 100%;
+  height: 100px;
+  border: 1px solid rgb(189, 189, 189);
+  background-color: #fff;
+  border-radius: 3px;
+  font-size: 14px;
+  color: rgb(61, 61, 61);
+  resize: none;
+}
+
+.kvkk-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.kvkk-text {
+  font-size: 14px;
+  color: rgb(31, 75, 219);
+  line-height: 1.4;
+}
+
+.recaptcha-placeholder {
+  width: 304px;
+  height: 78px;
+}
+
+.submit-wrap {
+  width: 320px;
+  margin-top: 10px;
+}
+
+.submit-btn {
+  width: 100%;
+  min-height: 50px;
+  background-color: rgba(54, 54, 74, 0.6);
+  color: var(--color_primary_contrast_default);
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 12px 24px;
+  box-shadow: 0px 7px 30px -10px rgba(2, 5, 211, 0.1);
+  transition: background 200ms;
+}
+
+.form-alert-wrap {
+  margin-top: 10px;
+}
+
+.form-alert,
+.footer-alert {
+  display: none;
+  background-color: rgba(0, 255, 85, 0.4);
+  min-height: 40px;
+  border-radius: 4px;
+}
+
+/* İletişim Bilgileri */
+
+.contact-locations {
+  display: flex;
+  flex-direction: column;
+}
+
+.location-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.location-icon {
+  width: 50px;
+  height: 50px;
+  flex: none;
+}
+
+.location-svg {
+  width: 100%;
+  height: 100%;
+  fill: currentcolor;
+}
+
+.location-name {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.4;
+  padding-left: 10px;
+}
+
+.location-address {
+  font-size: 14px;
+  color: rgb(31, 75, 219);
+  line-height: 1.4;
+  padding-left: 10px;
+  cursor: pointer;
+}
+
+.contact-quick-block {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.contact-quick-icons {
+  display: flex;
+  flex-direction: column;
+}
+
+.quick-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.quick-svg {
+  width: 100%;
+  height: 100%;
+  fill: currentcolor;
+}
+
+.contact-quick-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.quick-detail-label {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.4;
+  padding-left: 10px;
+}
+
+.quick-detail-value {
+  font-size: 14px;
+  color: rgb(31, 75, 219);
+  line-height: 1.4;
+  padding-left: 10px;
+  cursor: pointer;
+}
+
+.social-icons {
+  display: flex;
+  gap: 4px;
+  margin-top: 15px;
+}
+
+.social-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+}
+
+.social-svg {
+  width: 100%;
+  height: 100%;
+  fill: currentcolor;
+}
+
+/* =========================================================
+   Kariyer Bölümü
+   ========================================================= */
+
+.careers-section {
+  background-color: rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  row-gap: 8px;
+  width: 100%;
+  margin-top: 60px;
+  padding-bottom: 20px;
+  cursor: pointer;
+}
+
+.careers-title {
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.4;
+  padding: 60px 0 40px;
+}
+
+.careers-carousel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 1460px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 8px;
+}
+
+.careers-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1100px;
+  margin-bottom: 45px;
+}
+
+.career-card {
+  width: 320px;
+}
+
+.career-card-shadow {
+  background-color: #fff;
+  box-shadow: 2px 2px 4px 0 rgb(170, 170, 170);
+  border-radius: 5px;
+  min-height: 400px;
+}
+
+.career-card-image {
+  width: 100%;
+  height: 128px;
+  border-radius: 5px 5px 0 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.career-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 8px 10px;
+}
+
+.career-card-title {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.4;
+  padding-top: 8px;
+}
+
+.career-card-text {
+  font-size: 14px;
+  line-height: 1.4;
+  padding-top: 8px;
+}
+
+.career-btn {
+  display: inline-block;
+  background-color: rgb(30, 30, 47);
+  color: var(--color_primary_contrast_default);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 5px;
+  padding: 12px 24px;
+  margin: 15px 0 10px;
+  box-shadow: 0px 7px 30px -10px rgba(2, 5, 211, 0.1);
+  transition: background 200ms;
+}
+
+/* =========================================================
+   Footer
+   ========================================================= */
+
+.footer-section {
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  row-gap: 30px;
+  width: 100%;
+  padding: 80px 0;
+  margin-top: 60px;
+}
+
+.footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 30px;
+  max-width: 1280px;
+  width: calc(100% - 80px);
+  margin: 0 40px;
+  padding-bottom: 60px;
+  border-bottom: 1px solid rgb(226, 232, 240);
+}
+
+.footer-newsletter {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  margin-left: 15px;
+}
+
+.footer-newsletter-title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+
+.footer-field-label {
+  font-size: 14px;
+  color: rgba(9, 23, 71, 0.8);
+  line-height: 1.4;
+}
+
+.footer-input {
+  width: 100%;
+  max-width: 300px;
+  height: 48px;
+  border: 1px solid rgba(9, 23, 71, 0.15);
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 6px;
+}
+
+.footer-subscribe-btn {
+  max-width: 170px;
+  min-height: 50px;
+  background-color: rgb(54, 54, 74);
+  color: var(--color_primary_contrast_default);
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 12px 24px;
+  margin-top: 15px;
+  box-shadow: 0px 7px 30px -10px rgba(2, 5, 211, 0.1);
+  transition: background 200ms;
+}
+
+.footer-alert-wrap {
+  margin-top: 15px;
+}
+
+.footer-spacer {
+  flex: 1;
+  min-width: 1px;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  row-gap: 29px;
+  max-width: 294px;
+  margin-left: 15px;
+}
+
+.footer-logo {
+  width: 148px;
+}
+
+.footer-logo-img {
+  width: 100%;
+  display: block;
+}
+
+.footer-tagline {
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  color: rgb(113, 113, 122);
+  line-height: 1.4;
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px 0;
+  max-width: 1280px;
+  width: calc(100% - 80px);
+  margin: 0 40px;
+}
+
+.footer-copyright {
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  color: rgb(9, 9, 20);
+  line-height: 1.4;
+}
+
+.footer-powered {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.footer-powered-img {
+  width: 45px;
+  height: 45px;
+}
+
+.footer-powered-text {
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  color: rgb(9, 9, 20);
+  line-height: 1.4;
+}
+
+/* =========================================================
+   Üst Navigasyon (Navbar)
+   ========================================================= */
+
+.navbar {
+  position: fixed;
+  inset: 0;
+  height: 60px;
+  max-height: 50px;
+  width: 100%;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  z-index: 1503;
+}
+
+.navbar-inner {
+  width: 100%;
+}
+
+.navbar-row {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: calc(100% - 80px);
+  max-width: 1137px;
+  margin: 0 40px;
+}
+
+.navbar-logo {
+  display: block;
+  width: 128px;
+}
+
+.navbar-logo-img {
+  width: 100%;
+  display: block;
+  border-radius: 100px;
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color_text_default);
+  text-decoration: none;
+  line-height: 1.4;
+  border-radius: 50px;
+  padding: 12px 16px;
+  min-height: 46px;
+}
+
+.nav-link.active {
+  background-color: rgba(2, 5, 211, 0.08);
+  color: var(--color_primary_default);
+}
+
+.navbar-flowick-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.navbar-flowick-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 100px;
+}
+
+/* =========================================================
+   Duyarlı Tasarım (Responsive)
+   ========================================================= */
+
+@media (max-width: 992px) {
+  .services-grid,
+  .news-grid,
+  .careers-grid,
+  .documents-grid,
+  .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contact-section {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .services-grid,
+  .documents-grid,
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar-menu {
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .about-html-embed {
+    width: 100%;
+    height: 240px;
+  }
+}
