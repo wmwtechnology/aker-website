@@ -848,9 +848,54 @@ button {
   cursor: pointer;
 }
 
-.recaptcha-placeholder {
-  width: 304px;
-  height: 78px;
+.recaptcha-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 304px;
+  padding: 12px 16px;
+  margin: 10px 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.recaptcha-check-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recaptcha-check-wrap input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.recaptcha-check-wrap label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color_text_default);
+  cursor: pointer;
+}
+
+.recaptcha-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.recaptcha-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.recaptcha-text {
+  font-size: 10px;
+  color: rgb(82, 82, 91);
 }
 
 .submit-wrap {

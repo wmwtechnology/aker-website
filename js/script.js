@@ -257,6 +257,7 @@ function initContactForm() {
 
   const submitBtn = form.querySelector('.submit-btn');
   const kvkkCheckbox = form.querySelector('#kvkk-check');
+  const recaptchaCheckbox = form.querySelector('.recaptcha-checkbox');
   const alertBox = form.querySelector('.form-alert');
   const fileInput = form.querySelector('.file-input-wrap input[type="file"]');
   const fileLabel = form.querySelector('.file-input-label');
@@ -269,10 +270,18 @@ function initContactForm() {
     });
   }
 
+  function updateSubmitState() {
+    const kvkkOk = !kvkkCheckbox || kvkkCheckbox.checked;
+    const recaptchaOk = !recaptchaCheckbox || recaptchaCheckbox.checked;
+    submitBtn.disabled = !(kvkkOk && recaptchaOk);
+  }
+
   if (kvkkCheckbox && submitBtn) {
-    kvkkCheckbox.addEventListener('change', function () {
-      submitBtn.disabled = !kvkkCheckbox.checked;
-    });
+    kvkkCheckbox.addEventListener('change', updateSubmitState);
+  }
+
+  if (recaptchaCheckbox && submitBtn) {
+    recaptchaCheckbox.addEventListener('change', updateSubmitState);
   }
 
   const kvkkLink = document.getElementById('kvkk-link');
@@ -331,7 +340,8 @@ function initContactForm() {
       messageInput.value = '';
       if (fileInput) fileInput.value = '';
       if (fileLabel) fileLabel.textContent = 'Özgeçmiş Yükleyin';
-      kvkkCheckbox.checked = false;
+      if (kvkkCheckbox) kvkkCheckbox.checked = false;
+      if (recaptchaCheckbox) recaptchaCheckbox.checked = false;
       submitBtn.disabled = true;
     });
   }

@@ -181,13 +181,14 @@
 
   function renderTable(content, config) {
     var items = window.AkerStore.getAll(state.section);
+    var countHtml = '<div class="admin-record-count">Toplam Kayıt Sayısı : ' + items.length + '</div>';
 
     if (items.length === 0) {
-      content.innerHTML = '<div class="admin-empty">Henüz içerik eklenmedi.</div>';
+      content.innerHTML = countHtml + '<div class="admin-empty">Henüz içerik eklenmedi.</div>';
       return;
     }
 
-    var html = '<table class="admin-table"><thead><tr><th class="admin-order-col"></th>';
+    var html = countHtml + '<table class="admin-table"><thead><tr><th class="admin-order-col"></th>';
     config.columns.forEach(function (col) {
       html += '<th>' + col.label + '</th>';
     });
@@ -250,13 +251,14 @@
   // -------------------------------------------------------
   function renderApplications(content) {
     var apps = window.AkerApplications.getAll();
+    var countHtml = '<div class="admin-record-count">Toplam Kayıt Sayısı : ' + apps.length + '</div>';
 
     if (apps.length === 0) {
-      content.innerHTML = '<div class="admin-empty">Henüz başvuru yok.</div>';
+      content.innerHTML = countHtml + '<div class="admin-empty">Henüz başvuru yok.</div>';
       return;
     }
 
-    var html = '<table class="admin-table"><thead><tr>' +
+    var html = countHtml + '<table class="admin-table"><thead><tr>' +
       '<th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>E-Posta</th><th>İlan</th><th>Özgeçmiş</th><th></th>' +
       '</tr></thead><tbody>';
 
