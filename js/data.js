@@ -252,6 +252,24 @@
       this.save();
     },
 
+    move: function (collection, id, direction) {
+      var data = this.load();
+      var items = data[collection];
+      var index = -1;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].id === id) { index = i; break; }
+      }
+      if (index === -1) return;
+
+      var targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= items.length) return;
+
+      var temp = items[index];
+      items[index] = items[targetIndex];
+      items[targetIndex] = temp;
+      this.save();
+    },
+
     reset: function () {
       this._data = clone(DEFAULT_DATA);
       this.save();

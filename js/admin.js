@@ -81,6 +81,9 @@
 
   var SECTION_ORDER = ['careers', 'documents', 'news', 'team', 'applications'];
 
+  var ORDER_UP_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"></polyline></svg>';
+  var ORDER_DOWN_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
   var state = {
     section: 'slides',
     editingId: null
@@ -183,14 +186,18 @@
       return;
     }
 
-    var html = '<table class="admin-table"><thead><tr>';
+    var html = '<table class="admin-table"><thead><tr><th class="admin-order-col"></th>';
     config.columns.forEach(function (col) {
       html += '<th>' + col.label + '</th>';
     });
     html += '<th></th></tr></thead><tbody>';
 
-    items.forEach(function (item) {
+    items.forEach(function (item, index) {
       html += '<tr>';
+      html += '<td class="admin-row-order">' +
+        '<button class="admin-order-btn" data-action="move-up" data-id="' + item.id + '"' + (index === 0 ? ' disabled' : '') + ' aria-label="Yukarı taşı">' + ORDER_UP_SVG + '</button>' +
+        '<button class="admin-order-btn" data-action="move-down" data-id="' + item.id + '"' + (index === items.length - 1 ? ' disabled' : '') + ' aria-label="Aşağı taşı">' + ORDER_DOWN_SVG + '</button>' +
+        '</td>';
       config.columns.forEach(function (col) {
         var value = item[col.key] || '';
         if (col.type === 'image') {
@@ -210,6 +217,18 @@
     html += '</tbody></table>';
     content.innerHTML = html;
 
+    content.querySelectorAll('[data-action="move-up"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        window.AkerStore.move(state.section, btn.dataset.id, -1);
+        renderSection();
+      });
+    });
+    content.querySelectorAll('[data-action="move-down"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        window.AkerStore.move(state.section, btn.dataset.id, 1);
+        renderSection();
+      });
+    });
     content.querySelectorAll('[data-action="edit"]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         openModal(btn.dataset.id);

@@ -295,10 +295,55 @@ body.admin-body {
   background-color: rgba(9, 23, 71, 0.05);
 }
 
+.admin-table th:last-child,
+.admin-table td.admin-row-actions {
+  width: 160px;
+  text-align: right;
+}
+
+.admin-order-col,
+.admin-row-order {
+  width: 56px;
+  text-align: center;
+}
+
+.admin-order-btn {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 4px;
+  padding: 0;
+  border: 1px solid rgba(9, 23, 71, 0.1);
+  border-radius: 4px;
+  background-color: var(--color_surface_default);
+  color: var(--color_text_default);
+  cursor: pointer;
+}
+
+.admin-order-btn svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.admin-order-btn:last-child {
+  margin-bottom: 0;
+}
+
+.admin-order-btn:hover:not(:disabled) {
+  background-color: rgba(9, 23, 71, 0.06);
+}
+
+.admin-order-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
 .admin-row-actions {
-  display: flex;
-  gap: 8px;
   white-space: nowrap;
+}
+
+.admin-row-actions .admin-icon-btn + .admin-icon-btn {
+  margin-left: 8px;
 }
 
 .admin-icon-btn {
