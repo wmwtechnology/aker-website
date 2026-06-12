@@ -412,6 +412,8 @@ button {
 .news-card {
   width: 300px;
   display: flex;
+  color: inherit;
+  text-decoration: none;
 }
 
 .news-card-shadow {

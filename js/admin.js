@@ -56,7 +56,8 @@
       fields: [
         { key: 'title', label: 'Başlık', type: 'text' },
         { key: 'text', label: 'Açıklama', type: 'textarea' },
-        { key: 'image', label: 'Görsel', type: 'image' }
+        { key: 'image', label: 'Görsel', type: 'image' },
+        { key: 'link', label: 'Haber Linki (URL)', type: 'text' }
       ],
       columns: [
         { key: 'image', label: '', type: 'image' },

@@ -79,8 +79,13 @@ function renderNews() {
 
   var news = window.AkerStore.getAll('news');
   grid.innerHTML = news.map(function (item) {
+    var hasLink = item.link && item.link.trim();
+    var tagOpen = hasLink
+      ? '<a class="news-card" href="' + escapeAttr(item.link.trim()) + '" target="_blank" rel="noopener">'
+      : '<div class="news-card">';
+    var tagClose = hasLink ? '</a>' : '</div>';
     return '' +
-      '<div class="news-card">' +
+      tagOpen +
         '<div class="news-card-shadow">' +
           '<div class="news-card-image" style="background-image: url(&quot;' + item.image + '&quot;);"></div>' +
           '<div class="news-card-body">' +
@@ -88,8 +93,16 @@ function renderNews() {
             '<div class="news-card-text">' + item.text + '</div>' +
           '</div>' +
         '</div>' +
-      '</div>';
+      tagClose;
   }).join('');
+}
+
+function escapeAttr(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // ---------------------------------------------------------
