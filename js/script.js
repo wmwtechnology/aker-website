@@ -322,27 +322,83 @@ function initContactForm() {
 
       if (form.classList.contains('application-form') && window.AkerApplications) {
         const career = window.AkerStore ? window.AkerStore.getById('careers', form.dataset.careerId) : null;
-        window.AkerApplications.add({
-          careerId: form.dataset.careerId || '',
-          careerTitle: career ? career.title : '',
+        const cvFile = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0] : null;
+
+        const addApplication = function (cvFileData, cvFileType) {
+          window.AkerApplications.add({
+            careerId: form.dataset.careerId || '',
+            careerTitle: career ? career.title : '',
+            name: nameInput.value,
+            phone: phoneInput.value,
+            email: emailInput.value,
+            message: messageInput.value,
+            cvFileName: cvFile ? cvFile.name : '',
+            cvFileType: cvFileType || '',
+            cvFileData: cvFileData || ''
+          });
+
+          finishSubmit('Mesajınız başarıyla gönderildi.');
+        };
+
+        if (cvFile) {
+          const reader = new FileReader();
+          reader.onload = function () {
+            addApplication(reader.result, cvFile.type);
+          };
+          reader.onerror = function () {
+            addApplication('', '');
+          };
+          reader.readAsDataURL(cvFile);
+        } else {
+          addApplication('', '');
+        }
+        return;
+      }
+
+      const honeypot = form.querySelector('.hp-field');
+      submitBtn.disabled = true;
+
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: nameInput.value,
           phone: phoneInput.value,
           email: emailInput.value,
           message: messageInput.value,
-          cvFileName: (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0].name : ''
+          company_website: honeypot ? honeypot.value : ''
+        })
+      })
+        .then(function (res) {
+          return res.json().then(function (data) {
+            return { ok: res.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          if (result.ok && result.data.ok) {
+            finishSubmit('Mesajınız başarıyla gönderildi.');
+          } else {
+            showAlert(alertBox, result.data.error || 'Bir hata oluştu, lütfen tekrar deneyin.');
+            submitBtn.disabled = false;
+          }
+        })
+        .catch(function () {
+          showAlert(alertBox, 'Bağlantı hatası, lütfen tekrar deneyin.');
+          submitBtn.disabled = false;
         });
-      }
 
-      showAlert(alertBox, 'Mesajınız başarıyla gönderildi.');
-      form.querySelectorAll('.field-input').forEach(function (input) {
-        input.value = '';
-      });
-      messageInput.value = '';
-      if (fileInput) fileInput.value = '';
-      if (fileLabel) fileLabel.textContent = 'Özgeçmiş Yükleyin';
-      if (kvkkCheckbox) kvkkCheckbox.checked = false;
-      if (recaptchaCheckbox) recaptchaCheckbox.checked = false;
-      submitBtn.disabled = true;
+      function finishSubmit(message) {
+        showAlert(alertBox, message);
+        form.querySelectorAll('.field-input').forEach(function (input) {
+          input.value = '';
+        });
+        messageInput.value = '';
+        if (fileInput) fileInput.value = '';
+        if (fileLabel) fileLabel.textContent = 'Özgeçmiş Yükleyin';
+        if (kvkkCheckbox) kvkkCheckbox.checked = false;
+        if (recaptchaCheckbox) recaptchaCheckbox.checked = false;
+        submitBtn.disabled = true;
+      }
     });
   }
 }

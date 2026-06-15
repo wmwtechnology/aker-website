@@ -716,6 +716,14 @@ button {
   margin-top: 70px;
 }
 
+.hp-field {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .contact-form-title-wrap,
 .contact-info-title-wrap {
   margin: 10px 0;

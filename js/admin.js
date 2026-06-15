@@ -263,13 +263,18 @@
       '</tr></thead><tbody>';
 
     apps.forEach(function (app) {
+      var cvCell = escapeHtml(app.cvFileName || '-');
+      if (app.cvFileData) {
+        cvCell = '<a href="javascript:void(0)" class="admin-cv-link" data-action="open-cv" data-id="' + app.id + '">' +
+          escapeHtml(app.cvFileName || 'Özgeçmiş') + '</a>';
+      }
       html += '<tr>' +
         '<td>' + formatDate(app.date) + '</td>' +
         '<td>' + escapeHtml(app.name) + '</td>' +
         '<td>' + escapeHtml(app.phone) + '</td>' +
         '<td>' + escapeHtml(app.email) + '</td>' +
         '<td>' + escapeHtml(app.careerTitle || '-') + '</td>' +
-        '<td>' + escapeHtml(app.cvFileName || '-') + '</td>' +
+        '<td>' + cvCell + '</td>' +
         '<td class="admin-row-actions">' +
           '<button class="admin-icon-btn" data-action="view" data-id="' + app.id + '">Detay</button>' +
           '<button class="admin-icon-btn admin-icon-btn-danger" data-action="delete-app" data-id="' + app.id + '">Sil</button>' +
@@ -285,6 +290,12 @@
         if (app) showApplicationDetail(app);
       });
     });
+    content.querySelectorAll('[data-action="open-cv"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var app = apps.filter(function (a) { return a.id === btn.dataset.id; })[0];
+        if (app) openCvInNewTab(app);
+      });
+    });
     content.querySelectorAll('[data-action="delete-app"]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (confirm('Bu başvuruyu silmek istediğinize emin misiniz?')) {
@@ -293,6 +304,27 @@
         }
       });
     });
+  }
+
+  // data: URL'yi blob URL'ye çevirip yeni sekmede açar (büyük PDF'lerde
+  // data: URL'lerin bazı tarayıcılarda yeni sekmede açılması engellenebiliyor).
+  function openCvInNewTab(app) {
+    if (!app.cvFileData) return;
+    try {
+      var parts = app.cvFileData.split(',');
+      var meta = parts[0].match(/data:(.*);base64/);
+      var mime = (meta && meta[1]) || app.cvFileType || 'application/octet-stream';
+      var binary = atob(parts[1]);
+      var bytes = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      var blob = new Blob([bytes], { type: mime });
+      var url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } catch (e) {
+      window.open(app.cvFileData, '_blank');
+    }
   }
 
   function initAppDetailModal() {
@@ -310,8 +342,35 @@
       '<div class="admin-detail-row"><strong>E-Posta:</strong> ' + escapeHtml(app.email) + '</div>' +
       '<div class="admin-detail-row"><strong>İlan:</strong> ' + escapeHtml(app.careerTitle || '-') + '</div>' +
       '<div class="admin-detail-row"><strong>Özgeçmiş:</strong> ' + escapeHtml(app.cvFileName || '-') + '</div>' +
-      '<div class="admin-detail-row"><strong>Mesaj:</strong><br>' + escapeHtml(app.message || '') + '</div>';
+      '<div class="admin-detail-row"><strong>Mesaj:</strong><br>' + escapeHtml(app.message || '') + '</div>' +
+      renderCvPreview(app);
     document.getElementById('app-detail-modal').style.display = 'flex';
+
+    body.querySelectorAll('[data-action="open-cv"]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        openCvInNewTab(app);
+      });
+    });
+  }
+
+  function renderCvPreview(app) {
+    if (!app.cvFileData) return '';
+
+    var type = app.cvFileType || '';
+    var preview = '';
+    if (type.indexOf('image/') === 0) {
+      preview = '<img src="' + escapeAttr(app.cvFileData) + '" class="admin-cv-preview-img" data-action="open-cv" alt="Özgeçmiş önizleme (yeni sekmede açmak için tıklayın)">';
+    } else if (type === 'application/pdf') {
+      preview = '<iframe src="' + escapeAttr(app.cvFileData) + '" class="admin-cv-preview-frame"></iframe>';
+    } else {
+      preview = '<div class="admin-cv-preview-empty">Bu dosya türü için önizleme yok. Görüntülemek için yeni sekmede açın.</div>';
+    }
+
+    return '<div class="admin-detail-row admin-cv-preview-row">' +
+      '<strong>Özgeçmiş Önizleme:</strong>' +
+      '<button class="admin-icon-btn" data-action="open-cv">Yeni Sekmede Aç</button>' +
+      preview +
+      '</div>';
   }
 
   // -------------------------------------------------------

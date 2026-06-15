@@ -133,6 +133,36 @@
         id: 'doc-7',
         title: 'Kalite Yönetim Sistemi',
         image: 'https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=768,h=,f=auto,dpr=2,fit=contain/f1722432072191x936170300259501800/K%C3%96SELER%20ISO%20BELGELER%C4%B0-2.png'
+      },
+      {
+        id: 'doc-8',
+        title: 'Müşteri Memnuniyeti Yönetim Sistemi',
+        image: 'https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=768,h=,f=auto,dpr=2,fit=contain/f1722432092567x931053269371804200/K%C3%96SELER%20ISO%20BELGELER%C4%B0-3.png'
+      },
+      {
+        id: 'doc-9',
+        title: 'İş Sağlığı ve Güvenliği Yönetim Sistemi',
+        image: 'https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=768,h=,f=auto,dpr=2,fit=contain/f1722432115399x332588469911262000/K%C3%96SELER%20ISO%20BELGELER%C4%B0-4.png'
+      },
+      {
+        id: 'doc-10',
+        title: 'Çevre Yönetim Sistemi',
+        image: 'https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=768,h=,f=auto,dpr=2,fit=contain/f1722432135777x336183893479189900/SULTANORHAN%20ISO%20BELGELER%C4%B0-1.png'
+      },
+      {
+        id: 'doc-11',
+        title: 'İş Sağlığı ve Güvenliği Yönetim Sistemi',
+        image: 'https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=768,h=,f=auto,dpr=2,fit=contain/f1722432159952x516760808098807740/SULTANORHAN%20ISO%20BELGELER%C4%B0-2.png'
+      },
+      {
+        id: 'doc-12',
+        title: 'Kalite Yönetim Sistemi',
+        image: 'https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=768,h=,f=auto,dpr=2,fit=contain/f1722432179325x518042787748500540/SULTANORHAN%20ISO%20BELGELER%C4%B0-3.png'
+      },
+      {
+        id: 'doc-13',
+        title: 'Müşteri Memnuniyeti Yönetim Sistemi',
+        image: 'https://e0c771e7ae3bd68159a239fb345fe0e3.cdn.bubble.io/cdn-cgi/image/w=768,h=,f=auto,dpr=2,fit=contain/f1722432195927x322944541653952450/SULTANORHAN%20ISO%20BELGELER%C4%B0-4.png'
       }
     ],
 
