@@ -262,11 +262,20 @@ function initContactForm() {
   const fileInput = form.querySelector('.file-input-wrap input[type="file"]');
   const fileLabel = form.querySelector('.file-input-label');
 
+  function isPdfFile(file) {
+    return file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
+  }
+
   if (fileInput && fileLabel) {
     fileInput.addEventListener('change', function () {
-      fileLabel.textContent = (fileInput.files && fileInput.files[0])
-        ? fileInput.files[0].name
-        : 'Özgeçmiş Yükleyin';
+      const file = fileInput.files && fileInput.files[0];
+      if (file && !isPdfFile(file)) {
+        fileInput.value = '';
+        fileLabel.textContent = 'Özgeçmiş Yükleyin';
+        showAlert(alertBox, 'Lütfen özgeçmişinizi yalnızca PDF formatında yükleyin.');
+        return;
+      }
+      fileLabel.textContent = file ? file.name : 'Özgeçmiş Yükleyin';
     });
   }
 
@@ -323,6 +332,11 @@ function initContactForm() {
       if (form.classList.contains('application-form') && window.AkerApplications) {
         const career = window.AkerStore ? window.AkerStore.getById('careers', form.dataset.careerId) : null;
         const cvFile = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0] : null;
+
+        if (cvFile && !isPdfFile(cvFile)) {
+          showAlert(alertBox, 'Lütfen özgeçmişinizi yalnızca PDF formatında yükleyin.');
+          return;
+        }
 
         const addApplication = function (cvFileData, cvFileType) {
           window.AkerApplications.add({

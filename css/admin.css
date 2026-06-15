@@ -471,7 +471,8 @@ body.admin-body {
   border-radius: 5px;
 }
 
-.admin-cv-preview-empty {
+.admin-cv-preview-empty,
+.admin-cv-preview-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -479,6 +480,47 @@ body.admin-body {
   font-size: 13px;
   color: rgba(9, 23, 71, 0.5);
   background-color: rgba(9, 23, 71, 0.04);
+  border-radius: 5px;
+}
+
+.admin-cv-preview-docx {
+  max-height: 500px;
+  overflow: auto;
+  padding: 16px;
+  background-color: #fff;
+  border: 1px solid rgba(9, 23, 71, 0.15);
+  border-radius: 5px;
+}
+
+.admin-cv-preview-table {
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid rgba(9, 23, 71, 0.15);
+  border-radius: 5px;
+}
+
+.admin-cv-preview-table table {
+  border-collapse: collapse;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.admin-cv-preview-table table td,
+.admin-cv-preview-table table th {
+  border: 1px solid rgba(9, 23, 71, 0.1);
+  padding: 4px 8px;
+}
+
+.admin-cv-preview-text {
+  max-height: 420px;
+  overflow: auto;
+  padding: 12px;
+  margin: 0;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: #fff;
+  border: 1px solid rgba(9, 23, 71, 0.15);
   border-radius: 5px;
 }
 

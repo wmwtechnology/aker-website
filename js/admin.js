@@ -306,25 +306,36 @@
     });
   }
 
+  // data: URL'yi Blob'a çevirir.
+  function dataUrlToBlob(dataUrl, fallbackType) {
+    var parts = dataUrl.split(',');
+    var meta = parts[0].match(/data:(.*);base64/);
+    var mime = (meta && meta[1]) || fallbackType || 'application/octet-stream';
+    var binary = atob(parts[1]);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: mime });
+  }
+
   // data: URL'yi blob URL'ye çevirip yeni sekmede açar (büyük PDF'lerde
   // data: URL'lerin bazı tarayıcılarda yeni sekmede açılması engellenebiliyor).
   function openCvInNewTab(app) {
     if (!app.cvFileData) return;
     try {
-      var parts = app.cvFileData.split(',');
-      var meta = parts[0].match(/data:(.*);base64/);
-      var mime = (meta && meta[1]) || app.cvFileType || 'application/octet-stream';
-      var binary = atob(parts[1]);
-      var bytes = new Uint8Array(binary.length);
-      for (var i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-      var blob = new Blob([bytes], { type: mime });
+      var blob = dataUrlToBlob(app.cvFileData, app.cvFileType);
       var url = URL.createObjectURL(blob);
       window.open(url, '_blank');
     } catch (e) {
       window.open(app.cvFileData, '_blank');
     }
+  }
+
+  // Dosya adından uzantıyı döner (küçük harf, nokta olmadan).
+  function getFileExtension(fileName) {
+    var match = /\.([a-z0-9]+)$/i.exec(fileName || '');
+    return match ? match[1].toLowerCase() : '';
   }
 
   function initAppDetailModal() {
@@ -351,26 +362,88 @@
         openCvInNewTab(app);
       });
     });
+
+    renderCvPreviewAsync(app);
   }
 
   function renderCvPreview(app) {
     if (!app.cvFileData) return '';
 
-    var type = app.cvFileType || '';
-    var preview = '';
-    if (type.indexOf('image/') === 0) {
-      preview = '<img src="' + escapeAttr(app.cvFileData) + '" class="admin-cv-preview-img" data-action="open-cv" alt="Özgeçmiş önizleme (yeni sekmede açmak için tıklayın)">';
-    } else if (type === 'application/pdf') {
-      preview = '<iframe src="' + escapeAttr(app.cvFileData) + '" class="admin-cv-preview-frame"></iframe>';
-    } else {
-      preview = '<div class="admin-cv-preview-empty">Bu dosya türü için önizleme yok. Görüntülemek için yeni sekmede açın.</div>';
-    }
-
     return '<div class="admin-detail-row admin-cv-preview-row">' +
       '<strong>Özgeçmiş Önizleme:</strong>' +
       '<button class="admin-icon-btn" data-action="open-cv">Yeni Sekmede Aç</button>' +
-      preview +
+      '<div id="admin-cv-preview-target" class="admin-cv-preview-loading">Önizleme yükleniyor...</div>' +
       '</div>';
+  }
+
+  // Özgeçmiş önizlemesini dosya türüne göre asenkron olarak doldurur.
+  // Resim/PDF tarayıcıda doğrudan, DOCX docx-preview ile, XLSX/XLS/CSV
+  // SheetJS ile tabloya çevrilir; desteklenmeyen türlerde yeni sekmede
+  // açma seçeneği gösterilir.
+  function renderCvPreviewAsync(app) {
+    var target = document.getElementById('admin-cv-preview-target');
+    if (!target || !app.cvFileData) return;
+
+    var type = app.cvFileType || '';
+    var ext = getFileExtension(app.cvFileName);
+
+    target.classList.remove('admin-cv-preview-loading');
+
+    if (type.indexOf('image/') === 0) {
+      target.innerHTML = '<img src="' + escapeAttr(app.cvFileData) + '" class="admin-cv-preview-img" data-action="open-cv" alt="Özgeçmiş önizleme (yeni sekmede açmak için tıklayın)">';
+      target.querySelector('[data-action="open-cv"]').addEventListener('click', function () {
+        openCvInNewTab(app);
+      });
+      return;
+    }
+
+    if (type === 'application/pdf' || ext === 'pdf') {
+      target.innerHTML = '<iframe src="' + escapeAttr(app.cvFileData) + '" class="admin-cv-preview-frame"></iframe>';
+      return;
+    }
+
+    if (ext === 'docx' && window.docx && typeof window.docx.renderAsync === 'function') {
+      var docxContainer = document.createElement('div');
+      docxContainer.className = 'admin-cv-preview-docx';
+      target.innerHTML = '';
+      target.appendChild(docxContainer);
+      window.docx.renderAsync(dataUrlToBlob(app.cvFileData, app.cvFileType), docxContainer)
+        .catch(function () {
+          target.innerHTML = '<div class="admin-cv-preview-empty">Bu dosya önizlenemedi. Görüntülemek için yeni sekmede açın.</div>';
+        });
+      return;
+    }
+
+    if ((ext === 'xlsx' || ext === 'xls' || ext === 'csv') && window.XLSX) {
+      try {
+        var blob = dataUrlToBlob(app.cvFileData, app.cvFileType);
+        var reader = new FileReader();
+        reader.onload = function () {
+          var workbook = window.XLSX.read(new Uint8Array(reader.result), { type: 'array' });
+          var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          target.innerHTML = '<div class="admin-cv-preview-table">' + window.XLSX.utils.sheet_to_html(firstSheet, { editable: false }) + '</div>';
+        };
+        reader.onerror = function () {
+          target.innerHTML = '<div class="admin-cv-preview-empty">Bu dosya önizlenemedi. Görüntülemek için yeni sekmede açın.</div>';
+        };
+        reader.readAsArrayBuffer(blob);
+      } catch (e) {
+        target.innerHTML = '<div class="admin-cv-preview-empty">Bu dosya önizlenemedi. Görüntülemek için yeni sekmede açın.</div>';
+      }
+      return;
+    }
+
+    if (type.indexOf('text/') === 0 || ext === 'txt') {
+      try {
+        var binary = atob(app.cvFileData.split(',')[1]);
+        target.innerHTML = '<pre class="admin-cv-preview-text">' + escapeHtml(decodeURIComponent(escape(binary))) + '</pre>';
+      } catch (e) {
+        target.innerHTML = '<div class="admin-cv-preview-empty">Bu dosya önizlenemedi. Görüntülemek için yeni sekmede açın.</div>';
+      }
+      return;
+    }
+
+    target.innerHTML = '<div class="admin-cv-preview-empty">Bu dosya türü için önizleme yok. Görüntülemek için yeni sekmede açın.</div>';
   }
 
   // -------------------------------------------------------
