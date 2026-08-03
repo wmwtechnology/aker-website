@@ -235,8 +235,29 @@ function initNewsletterForm(): void {
     event.preventDefault();
     if (subscribeBtn.disabled) return;
 
-    showAlert(alertBox, 'Abonelik talebiniz alındı.');
-    emailInput.value = '';
     subscribeBtn.disabled = true;
+
+    fetch('/api/bulten', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: emailInput.value }),
+    })
+      .then(async (res) => {
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        return { ok: res.ok, data };
+      })
+      .then((result) => {
+        if (result.ok && result.data.ok) {
+          showAlert(alertBox, 'Bültenimize kaydınız alındı.');
+          emailInput.value = '';
+        } else {
+          showAlert(alertBox, result.data.error ?? 'Kaydedilemedi, lütfen tekrar deneyin.');
+          subscribeBtn.disabled = false;
+        }
+      })
+      .catch(() => {
+        showAlert(alertBox, 'Bağlantı hatası, lütfen tekrar deneyin.');
+        subscribeBtn.disabled = false;
+      });
   });
 }

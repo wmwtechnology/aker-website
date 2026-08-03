@@ -1,6 +1,8 @@
 import { checkOrigin, json } from '../_lib/http.ts';
 import { esc, isEmail, isText, sendMail } from '../_lib/mail.ts';
 import { newId } from '../_lib/content.ts';
+import { clientIp } from '../_lib/auth.ts';
+import { hizSiniri } from '../_lib/ratelimit.ts';
 import type { Ctx } from '../_lib/env.ts';
 
 interface ContactBody {
@@ -38,6 +40,12 @@ export const onRequestPost = async ({ request, env }: Ctx): Promise<Response> =>
   if (!isText(body.phone, 30)) return json({ error: 'Telefon gerekli' }, 422);
   if (!isEmail(body.email)) return json({ error: 'Geçerli bir e-posta girin' }, 422);
   if (!isText(body.message, 4000)) return json({ error: 'Mesaj gerekli' }, 422);
+
+  // Sitedeki onay kutusu gerçek bir doğrulama değil; bot koruması burada.
+  const limit = await hizSiniri(env, `iletisim:${clientIp(request)}`, 5, 10 * 60 * 1000);
+  if (!limit.izinli) {
+    return json({ error: 'Çok fazla mesaj gönderdiniz, biraz sonra tekrar deneyin.' }, 429);
+  }
 
   const mailYapilandirildi = Boolean(env.RESEND_API_KEY && env.CONTACT_TO_EMAIL && env.MAIL_FROM);
   let mailGitti = false;

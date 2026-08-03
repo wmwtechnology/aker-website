@@ -11,21 +11,21 @@ INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-1', 0, '/im
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-2', 1, '/img/client-2.webp', 'Voestalpine logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-3', 2, '/img/client-3.webp', 'Vivotech logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-4', 3, '/img/client-4.webp', 'TOSB logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-5', 4, '/img/client-5.webp', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-5', 4, '/img/client-5.webp', 'TemkaCam logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-6', 5, '/img/client-6.webp', 'Tayaş logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-7', 6, '/img/client-7.webp', 'Sönmez trafo logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-8', 7, '/img/client-8.webp', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-8', 7, '/img/client-8.webp', 'Smart Güneş Teknolojileri logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-9', 8, '/img/client-9.webp', 'Rafex logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-10', 9, '/img/client-10.svg', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-10', 9, '/img/client-10.svg', 'Pulver logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-11', 10, '/img/client-11.webp', 'Plastay logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-12', 11, '/img/client-12.webp', 'Pimtaş logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-13', 12, '/img/client-13.webp', 'Pimsa automotive logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-14', 13, '/img/client-14.webp', 'Özmer pastacılık logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-15', 14, '/img/client-15.webp', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-15', 14, '/img/client-15.webp', 'Opsan logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-16', 15, '/img/client-16.webp', 'Odeabank logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-17', 16, '/img/client-17.webp', 'Numarine logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-18', 17, '/img/client-18.webp', 'Namet logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-19', 18, '/img/client-19.webp', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-19', 18, '/img/client-19.webp', 'Lineadecor logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-20', 19, '/img/client-20.webp', 'Kubota logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-21', 20, '/img/client-21.webp', 'Körfez Döküm logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-22', 21, '/img/client-22.webp', 'Kocaeli Kobi OSGB logosu');
@@ -37,7 +37,7 @@ INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-27', 26, '/
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-28', 27, '/img/client-28.webp', 'Kanca logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-29', 28, '/img/client-29.webp', 'İnci makina logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-30', 29, '/img/client-30.webp', 'Hp pelzer pimsa logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-31', 30, '/img/client-31.svg', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-31', 30, '/img/client-31.svg', 'Hepsiburada logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-32', 31, '/img/client-32.webp', 'Hasçelik logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-33', 32, '/img/client-33.webp', 'Golf logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-34', 33, '/img/client-34.webp', 'Gebze Güzeller OSGB logosu');
@@ -47,7 +47,7 @@ INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-37', 36, '/
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-38', 37, '/img/client-38.webp', 'Flormar logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-39', 38, '/img/client-39.webp', 'Eurotray1 logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-40', 39, '/img/client-40.webp', 'Egesim logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-41', 40, '/img/client-41.webp', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-41', 40, '/img/client-41.webp', 'Egger logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-42', 41, '/img/client-42.webp', 'Darıca belediyesi logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-43', 42, '/img/client-43.webp', 'Dadaş metal logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-44', 43, '/img/client-44.webp', 'Corning logosu');
@@ -57,9 +57,9 @@ INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-47', 46, '/
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-48', 47, '/img/client-48.webp', 'Bericap logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-49', 48, '/img/client-49.webp', 'Başiskele belediyesi logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-50', 49, '/img/client-50.webp', 'Avansas logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-51', 50, '/img/client-51.webp', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-51', 50, '/img/client-51.webp', 'Atabay Kimya Sanayi ve Ticaret A.Ş. logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-52', 51, '/img/client-52.webp', 'Arvato logosu');
-INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-53', 52, '/img/client-53.webp', 'AKER OSGB referans müşterisi logosu');
+INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-53', 52, '/img/client-53.webp', 'Anadolu Motor logosu');
 INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-54', 53, '/img/client-54.webp', 'alba kalıp logosu');
 
 -- careers (3 kayıt)

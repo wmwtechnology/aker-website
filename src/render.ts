@@ -19,10 +19,21 @@ export function esc(value: unknown): string {
     .replace(/"/g, '&quot;');
 }
 
-/** Bilinen yerel görseller için width/height nitelikleri; yüklenenlerde boş döner. */
+/**
+ * Görselin width/height niteliklerini üretir.
+ *
+ * İki kaynak var: repodaki görsellerin boyutları üretilmiş tablodan,
+ * panelden yüklenenlerinki dosya adına gömülü ölçüden (`...-800x600.webp`)
+ * okunur. İkisi de yoksa nitelik yazılmaz.
+ */
 function dims(src: string): string {
   const size = IMAGE_SIZES[src.replace('/img/', '')];
-  return size ? ` width="${size.width}" height="${size.height}"` : '';
+  if (size) return ` width="${size.width}" height="${size.height}"`;
+
+  const yuklenen = /-(\d{1,5})x(\d{1,5})\.[a-z0-9]+$/i.exec(src);
+  if (yuklenen) return ` width="${yuklenen[1]}" height="${yuklenen[2]}"`;
+
+  return '';
 }
 
 export function renderSlides(slides: Slide[]): string {

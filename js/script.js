@@ -206,9 +206,27 @@
     subscribeBtn.addEventListener("click", (event) => {
       event.preventDefault();
       if (subscribeBtn.disabled) return;
-      showAlert(alertBox, "Abonelik talebiniz alındı.");
-      emailInput.value = "";
       subscribeBtn.disabled = true;
+      fetch("/api/bulten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailInput.value })
+      }).then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        return { ok: res.ok, data };
+      }).then((result) => {
+        var _a;
+        if (result.ok && result.data.ok) {
+          showAlert(alertBox, "Bültenimize kaydınız alındı.");
+          emailInput.value = "";
+        } else {
+          showAlert(alertBox, (_a = result.data.error) != null ? _a : "Kaydedilemedi, lütfen tekrar deneyin.");
+          subscribeBtn.disabled = false;
+        }
+      }).catch(() => {
+        showAlert(alertBox, "Bağlantı hatası, lütfen tekrar deneyin.");
+        subscribeBtn.disabled = false;
+      });
     });
   }
 })();

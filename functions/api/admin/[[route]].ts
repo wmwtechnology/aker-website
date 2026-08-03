@@ -52,6 +52,10 @@ export const onRequest = async (ctx: Ctx): Promise<Response> => {
     return messagesRoute(request, env, second);
   }
 
+  if (first === 'subscribers') {
+    return subscribersRoute(request, env, parts.slice(1).join('/'));
+  }
+
   if (first === 'cv') {
     if (request.method !== 'GET') return json({ error: 'method' }, 405);
     return serveCv(env, parts.slice(1).join('/'));
@@ -201,6 +205,42 @@ async function messagesRoute(request: Request, env: Env, id: string | undefined)
   if (request.method === 'DELETE') {
     if (!isValidId(id)) return json({ error: 'Geçersiz kimlik.' }, 400);
     const sonuc = await env.DB.prepare('DELETE FROM messages WHERE id = ?').bind(id).run();
+    if (!sonuc.meta.changes) return json({ error: 'Kayıt bulunamadı.' }, 404);
+    return json({ ok: true });
+  }
+
+  return json({ error: 'method' }, 405);
+}
+
+// ---------------------------------------------------------
+// Bülten aboneleri
+// ---------------------------------------------------------
+async function subscribersRoute(request: Request, env: Env, kalan: string): Promise<Response> {
+  if (request.method === 'GET') {
+    const sonuc = await env.DB.prepare(
+      'SELECT email, olusturuldu FROM subscribers ORDER BY olusturuldu DESC LIMIT 5000',
+    ).all();
+    const kayitlar = (sonuc.results ?? []) as { email: string; olusturuldu: string }[];
+
+    // .../subscribers/csv adresi listeyi dosya olarak indirir.
+    if (kalan === 'csv') {
+      const satirlar = ['E-Posta,Kayit Tarihi', ...kayitlar.map((k) => `${k.email},${k.olusturuldu}`)];
+      return new Response(`﻿${satirlar.join('\r\n')}`, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': 'attachment; filename="bulten-aboneleri.csv"',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+
+    return json({ kayitlar });
+  }
+
+  if (request.method === 'DELETE') {
+    const email = decodeURIComponent(kalan);
+    if (!email) return json({ error: 'Geçersiz adres.' }, 400);
+    const sonuc = await env.DB.prepare('DELETE FROM subscribers WHERE email = ?').bind(email).run();
     if (!sonuc.meta.changes) return json({ error: 'Kayıt bulunamadı.' }, 404);
     return json({ ok: true });
   }

@@ -139,18 +139,25 @@ interface Mesaj {
   mail_gitti: number;
 }
 
+interface Abone {
+  email: string;
+  olusturuldu: string;
+}
+
 const state: {
   section: string;
   editingId: string | null;
   kayitlar: Kayit[];
   basvurular: Basvuru[];
   mesajlar: Mesaj[];
+  aboneler: Abone[];
 } = {
   section: 'slides',
   editingId: null,
   kayitlar: [],
   basvurular: [],
   mesajlar: [],
+  aboneler: [],
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -281,6 +288,15 @@ async function renderSection(): Promise<void> {
       const { kayitlar } = await api.listele<Mesaj>('messages');
       state.mesajlar = kayitlar;
       renderMessages(content);
+      return;
+    }
+
+    if (state.section === 'subscribers') {
+      titleEl.textContent = 'Bülten Aboneleri';
+      addBtn.style.display = 'none';
+      const { kayitlar } = await api.listele<Abone>('subscribers');
+      state.aboneler = kayitlar;
+      renderSubscribers(content);
       return;
     }
 
@@ -495,6 +511,48 @@ function showMessageDetail(mesaj: Mesaj): void {
     `<div class="admin-detail-row"><strong>E-Posta Durumu:</strong> ${mesaj.mail_gitti ? 'Bildirim e-postası gönderildi' : 'Bildirim e-postası gönderilmedi (yalnızca kayıt)'}</div>`;
 
   modal.style.display = 'flex';
+}
+
+// ---------------------------------------------------------
+// Bülten aboneleri
+// ---------------------------------------------------------
+function renderSubscribers(content: HTMLElement): void {
+  const aboneler = state.aboneler;
+  const ustBilgi =
+    `<div class="admin-record-count">Toplam Kayıt Sayısı : ${aboneler.length}` +
+    (aboneler.length
+      ? ' &nbsp;·&nbsp; <a class="admin-cv-link" href="/api/admin/subscribers/csv">CSV olarak indir</a>'
+      : '') +
+    '</div>';
+
+  if (aboneler.length === 0) {
+    content.innerHTML = `${ustBilgi}<div class="admin-empty">Henüz abone yok.</div>`;
+    return;
+  }
+
+  const rows = aboneler
+    .map(
+      (a) =>
+        '<tr>' +
+        `<td><a href="mailto:${escapeAttr(a.email)}">${escapeHtml(a.email)}</a></td>` +
+        `<td>${formatDate(a.olusturuldu)}</td>` +
+        '<td class="admin-row-actions">' +
+        `<button class="admin-icon-btn admin-icon-btn-danger" data-action="delete-sub" data-id="${escapeAttr(a.email)}">Sil</button>` +
+        '</td></tr>',
+    )
+    .join('');
+
+  content.innerHTML =
+    `${ustBilgi}<table class="admin-table"><thead><tr><th>E-Posta</th><th>Kayıt Tarihi</th><th></th></tr></thead>` +
+    `<tbody>${rows}</tbody></table>`;
+
+  bindRowAction(content, 'delete-sub', (email) => {
+    if (!confirm('Bu aboneyi silmek istediğinize emin misiniz?')) return;
+    api
+      .sil('subscribers', email)
+      .then(() => renderSection())
+      .catch(hatayiIsle);
+  });
 }
 
 function initAppDetailModal(): void {

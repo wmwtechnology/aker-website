@@ -96,6 +96,20 @@ CREATE TABLE IF NOT EXISTS messages (
 
 CREATE INDEX IF NOT EXISTS idx_messages_tarih ON messages (olusturuldu DESC);
 
+-- E-posta bülteni aboneleri.
+CREATE TABLE IF NOT EXISTS subscribers (
+  email        TEXT PRIMARY KEY,
+  olusturuldu  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Form gönderimlerinin IP başına hız sınırı. Pencere başlangıcı ve
+-- sayaç tutulur; reCAPTCHA yerine gerçek bot koruması budur.
+CREATE TABLE IF NOT EXISTS form_limits (
+  anahtar      TEXT PRIMARY KEY,
+  sayac        INTEGER NOT NULL DEFAULT 0,
+  pencere      INTEGER NOT NULL DEFAULT 0
+);
+
 -- Başarısız giriş denemeleri (kaba kuvvet sınırlaması).
 CREATE TABLE IF NOT EXISTS login_attempts (
   ip           TEXT PRIMARY KEY,

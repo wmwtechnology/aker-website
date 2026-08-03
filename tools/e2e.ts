@@ -10,8 +10,11 @@
 //           node tools/e2e.ts
 // =========================================================
 
-export {};
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const KOK = process.env['E2E_URL'] ?? 'http://localhost:8788';
 const SIFRE = process.env['E2E_PASSWORD'] ?? 'aker2026test';
 
@@ -170,13 +173,13 @@ async function calistir(): Promise<void> {
   // --- Görsel yükleme ---
   console.log('\nGörsel yükleme');
   const form = new FormData();
-  const png = Uint8Array.from([
-    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
-  ]);
-  form.append('file', new Blob([png], { type: 'image/png' }), 'sinama.png');
+  // Gerçek bir WebP yüklenir; boyutun dosya adına gömüldüğü de sınanır.
+  const webp = readFileSync(path.join(ROOT, 'img', 'client-1.webp'));
+  form.append('file', new Blob([webp], { type: 'image/webp' }), 'sinama.webp');
   const yukle = await iste('/api/admin/upload', { method: 'POST', body: form });
   const yol = String(yukle.json['yol'] ?? '');
   sonuc('görsel yüklendi', yukle.status === 200 && yol.startsWith('/img/uploads/'), yol || String(yukle.status));
+  sonuc('görsel boyutu dosya adına gömüldü', /-\d+x\d+\.webp$/.test(yol), yol);
 
   if (yol) {
     const gorsel = await iste(yol);
@@ -253,6 +256,36 @@ async function calistir(): Promise<void> {
     const silMesaj = await iste(`/api/admin/messages/${mesaj.id}`, { method: 'DELETE' });
     sonuc('mesaj silinebiliyor', silMesaj.status === 200);
   }
+
+  // --- Bülten aboneliği ---
+  console.log('\nBülten aboneliği');
+  const abone = await iste('/api/bulten', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'abone@example.com' }),
+  });
+  sonuc('abonelik kaydedildi', abone.status === 200, String(abone.status));
+
+  const gecersizAbone = await iste('/api/bulten', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'gecersiz-adres' }),
+  });
+  sonuc('geçersiz e-posta reddedildi', gecersizAbone.status === 422, String(gecersizAbone.status));
+
+  const aboneler = (await iste('/api/admin/subscribers')).json['kayitlar'] as { email: string }[] | undefined;
+  sonuc('abone panelde görünüyor', Boolean(aboneler?.some((a) => a.email === 'abone@example.com')));
+
+  const csv = await iste('/api/admin/subscribers/csv');
+  sonuc('CSV dışa aktarımı çalışıyor', csv.status === 200 && csv.govde.includes('abone@example.com'));
+
+  const silAbone = await iste('/api/admin/subscribers/abone%40example.com', { method: 'DELETE' });
+  sonuc('abone silinebiliyor', silAbone.status === 200, String(silAbone.status));
+
+  // --- Referans logolarının alt metinleri ---
+  console.log('\nGörsel alt metinleri');
+  sonuc('logo alt metinleri firma adlarını içeriyor', ana.govde.includes('Hepsiburada logosu'));
+  sonuc('genel alt metin kalmadı', !ana.govde.includes('AKER OSGB referans müşterisi logosu'));
 
   // --- Temizlik ---
   console.log('\nTemizlik ve çıkış');

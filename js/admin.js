@@ -152,7 +152,8 @@
     editingId: null,
     kayitlar: [],
     basvurular: [],
-    mesajlar: []
+    mesajlar: [],
+    aboneler: []
   };
   document.addEventListener("DOMContentLoaded", () => {
     void baslat();
@@ -258,6 +259,14 @@
         const { kayitlar: kayitlar2 } = await api.listele("messages");
         state.mesajlar = kayitlar2;
         renderMessages(content);
+        return;
+      }
+      if (state.section === "subscribers") {
+        titleEl.textContent = "Bülten Aboneleri";
+        addBtn.style.display = "none";
+        const { kayitlar: kayitlar2 } = await api.listele("subscribers");
+        state.aboneler = kayitlar2;
+        renderSubscribers(content);
         return;
       }
       const config = COLLECTIONS[state.section];
@@ -374,6 +383,22 @@
     if (!body || !modal) return;
     body.innerHTML = `<div class="admin-detail-row"><strong>Tarih:</strong> ${formatDate(mesaj.olusturuldu)}</div><div class="admin-detail-row"><strong>Ad Soyad:</strong> ${escapeHtml(mesaj.name)}</div><div class="admin-detail-row"><strong>Telefon:</strong> <a href="tel:${escapeAttr(mesaj.phone)}">${escapeHtml(mesaj.phone)}</a></div><div class="admin-detail-row"><strong>E-Posta:</strong> <a href="mailto:${escapeAttr(mesaj.email)}">${escapeHtml(mesaj.email)}</a></div><div class="admin-detail-row"><strong>Mesaj:</strong><br>${escapeHtml(mesaj.message)}</div><div class="admin-detail-row"><strong>E-Posta Durumu:</strong> ${mesaj.mail_gitti ? "Bildirim e-postası gönderildi" : "Bildirim e-postası gönderilmedi (yalnızca kayıt)"}</div>`;
     modal.style.display = "flex";
+  }
+  function renderSubscribers(content) {
+    const aboneler = state.aboneler;
+    const ustBilgi = `<div class="admin-record-count">Toplam Kayıt Sayısı : ${aboneler.length}` + (aboneler.length ? ' &nbsp;·&nbsp; <a class="admin-cv-link" href="/api/admin/subscribers/csv">CSV olarak indir</a>' : "") + "</div>";
+    if (aboneler.length === 0) {
+      content.innerHTML = `${ustBilgi}<div class="admin-empty">Henüz abone yok.</div>`;
+      return;
+    }
+    const rows = aboneler.map(
+      (a) => `<tr><td><a href="mailto:${escapeAttr(a.email)}">${escapeHtml(a.email)}</a></td><td>${formatDate(a.olusturuldu)}</td><td class="admin-row-actions"><button class="admin-icon-btn admin-icon-btn-danger" data-action="delete-sub" data-id="${escapeAttr(a.email)}">Sil</button></td></tr>`
+    ).join("");
+    content.innerHTML = `${ustBilgi}<table class="admin-table"><thead><tr><th>E-Posta</th><th>Kayıt Tarihi</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+    bindRowAction(content, "delete-sub", (email) => {
+      if (!confirm("Bu aboneyi silmek istediğinize emin misiniz?")) return;
+      api.sil("subscribers", email).then(() => renderSection()).catch(hatayiIsle);
+    });
   }
   function initAppDetailModal() {
     var _a;

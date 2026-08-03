@@ -9,6 +9,8 @@ import { checkOrigin, json } from '../_lib/http.ts';
 import { esc, isEmail, isText, sendMail } from '../_lib/mail.ts';
 import { putCv, safeName } from '../_lib/media.ts';
 import { newId } from '../_lib/content.ts';
+import { clientIp } from '../_lib/auth.ts';
+import { hizSiniri } from '../_lib/ratelimit.ts';
 import type { Ctx } from '../_lib/env.ts';
 
 export const onRequestPost = async ({ request, env }: Ctx): Promise<Response> => {
@@ -36,6 +38,11 @@ export const onRequestPost = async ({ request, env }: Ctx): Promise<Response> =>
   if (!isText(phone, 30)) return json({ error: 'Telefon gerekli' }, 422);
   if (!isEmail(email)) return json({ error: 'Geçerli bir e-posta girin' }, 422);
   if (!isText(message, 4000)) return json({ error: 'Mesaj gerekli' }, 422);
+
+  const limit = await hizSiniri(env, `basvuru:${clientIp(request)}`, 5, 10 * 60 * 1000);
+  if (!limit.izinli) {
+    return json({ error: 'Çok fazla başvuru gönderdiniz, biraz sonra tekrar deneyin.' }, 429);
+  }
 
   const ilan = careerId
     ? await env.DB.prepare('SELECT title FROM careers WHERE id = ?').bind(careerId).first<{ title: string }>()
