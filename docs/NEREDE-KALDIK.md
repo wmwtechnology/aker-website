@@ -255,15 +255,16 @@ Sonrasında gerçek bir gönderim denemesi yapılıp kutuya düştüğü doğrul
 - **Şube koordinatları.** `LocalBusiness` şemasına `geo` eklenmedi (enlem/boylam yok).
   Google Business Profile'dan alınıp `tools/site.ts`'e eklenebilir.
 - **Açılış saatleri.** `openingHours` bilgisi yok; şemaya eklenmesi yerel SEO'ya katkı sağlar.
-- **E-posta bülteni** formu hâlâ sahte (sadece "talebiniz alındı" mesajı veriyor,
-  hiçbir yere kayıt olmuyor). Ya gerçek bir servise bağlanmalı ya da kaldırılmalı.
-- **reCAPTCHA kutusu** gerçek reCAPTCHA değil, sadece bir onay kutusu. Gerçek bot koruması
-  için Turnstile veya reCAPTCHA v3 bağlanmalı.
-- **Ana sayfa müşteri logoları**: 8 logonun dosya adı anlamsız olduğu için alt metni
-  genel ("AKER OSGB referans müşterisi logosu"). Firma adları panelden düzeltilebilir.
-- **Görsel boyutları**: panelden yüklenen görsellerde `width`/`height` niteliği yok
-  (sunucuda boyut okunmuyor). Yerleşim kaymasını tamamen bitirmek için yükleme sırasında
-  boyut saklanabilir.
+- ~~E-posta bülteni formu sahte~~ — **çözüldü**: abonelikler D1'e yazılıyor, panelde
+  "Bülten Aboneleri" bölümü ve CSV dışa aktarım var. Gerçek bir e-posta pazarlama
+  servisine bağlanmak istenirse liste CSV olarak alınabilir.
+- ~~reCAPTCHA kutusu sahte~~ — **çözüldü**: Google rozeti kaldırıldı, yerine sunucu
+  tarafında IP başına hız sınırı kondu (10 dakikada 5 gönderim; iletişim, başvuru
+  ve bülten uçlarında). Daha güçlü koruma istenirse Turnstile eklenebilir.
+- ~~Müşteri logolarının genel alt metni~~ — **çözüldü**: 9 logonun firma adı
+  görsellerden okunup yazıldı.
+- ~~Yüklenen görsellerde width/height yok~~ — **çözüldü**: yükleme sırasında görsel
+  başlığından boyut okunup dosya adına gömülüyor, sayfa üretilirken niteliğe dönüyor.
 - **Cloudflare Access**: panel şifresi artık sunucuda, ancak `/admin` yolunu Access ile
   ikinci bir katmana almak yine de önerilir.
 
