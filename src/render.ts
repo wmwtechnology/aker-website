@@ -53,12 +53,15 @@ export function renderNews(news: NewsItem[]): string {
         : '<div class="news-card">';
       const close = link ? '</a>' : '</div>';
 
+      // Bağlantısı olmayan haber kartı tıklanabilir görünmez.
+      const okuBagi = link ? '\n              <span class="news-card-link">Haberi oku &rarr;</span>' : '';
+
       return `        ${open}
           <div class="news-card-shadow">
             <div class="news-card-image" style="background-image: url(&quot;${esc(item.image)}&quot;);" role="img" aria-label="${esc(item.title)}"></div>
             <div class="news-card-body">
               <h3 class="news-card-title">${esc(item.title)}</h3>
-              <p class="news-card-text">${esc(item.text)}</p>
+              <p class="news-card-text">${esc(item.text)}</p>${okuBagi}
             </div>
           </div>
         ${close}`;

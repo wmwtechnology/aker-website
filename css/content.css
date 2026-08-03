@@ -88,6 +88,34 @@
   color: #0205d3;
 }
 
+/* --- Haber kartları: yalnızca bağlantısı olan kart tıklanabilir görünür --- */
+div.news-card {
+  cursor: default;
+}
+
+a.news-card {
+  cursor: pointer;
+}
+
+a.news-card:hover .news-card-shadow,
+a.news-card:focus-visible .news-card-shadow {
+  box-shadow: 2px 2px 10px 0 rgb(100, 100, 100);
+  transform: translateY(-2px);
+}
+
+.news-card-shadow {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.news-card-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0205d3;
+}
+
 /* --- Ana sayfa: metin içi bağlantılar --- */
 .about-paragraph + .about-paragraph {
   margin-top: 14px;

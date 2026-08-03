@@ -283,8 +283,8 @@ function navBlock(currentPath: string): string {
         })}</a>
         <div class="navbar-menu">
 ${links}
-            <a class="navbar-flowick-icon" href="https://wmw360.io/" target="_blank" rel="noopener" title="Flowick BPM'e giriş"><img src="/img/flowick-logo.png" alt="Flowick BPM" width="128" height="128" class="navbar-flowick-img" loading="lazy" decoding="async"></a>
-            <a class="nav-link" href="https://wmw360.io/" target="_blank" rel="noopener">Flowick BPM</a>
+            <a class="navbar-flowick-icon" href="https://flowickbpm.com" target="_blank" rel="noopener" title="Flowick BPM'e giriş"><img src="/img/flowick-logo.png" alt="Flowick BPM" width="128" height="128" class="navbar-flowick-img" loading="lazy" decoding="async"></a>
+            <a class="nav-link" href="https://flowickbpm.com" target="_blank" rel="noopener">Flowick BPM</a>
         </div>
       </div>
     </div>
