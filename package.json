@@ -1,0 +1,22 @@
+{
+  "name": "aker-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AKER OSGB kurumsal web sitesi - statik site, Cloudflare Pages",
+  "type": "module",
+  "scripts": {
+    "build": "npm run bundle && npm run pages",
+    "bundle": "node tools/bundle.ts",
+    "pages": "node tools/build.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "node tools/seo-check.ts",
+    "verify": "npm run typecheck && npm run build && npm run check",
+    "dev": "node tools/serve.ts"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250801.0",
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.0"
+  }
+}

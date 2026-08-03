@@ -1,0 +1,18 @@
+# Cloudflare Pages yönlendirmeleri
+# Not: Pages, /sayfa.html isteklerini /sayfa adresine kendiliğinden 301 ile
+# yönlendirir; bu dosyada ayrıca tanımlamaya gerek yoktur.
+# www -> apex yönlendirmesi Pages üzerinden değil, Cloudflare panelindeki
+# Redirect Rule ile yapılır (bkz. docs/NEREDE-KALDIK.md).
+
+# Eski gezinme takma adları
+/hizmetler            /hizmetlerimiz            301
+/hizmetler/*          /hizmetlerimiz/:splat     301
+/sikca-sorulan-sorular /sss                     301
+/subeler              /subelerimiz              301
+/is-basvuru           /isbasvuru                301
+/is-basvurusu         /isbasvuru                301
+/kvkk-metni           /kvkk                     301
+
+# Bubble kalıntısı adresler
+/version-test/*       /                         301
+/index.html           /                         301
