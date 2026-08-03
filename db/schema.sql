@@ -81,6 +81,21 @@ CREATE TABLE IF NOT EXISTS applications (
 
 CREATE INDEX IF NOT EXISTS idx_applications_tarih ON applications (olusturuldu DESC);
 
+-- İletişim formu mesajları. E-posta gönderimi yapılandırılmamış olsa bile
+-- mesaj burada saklanır; hiçbir talep kaybolmaz.
+CREATE TABLE IF NOT EXISTS messages (
+  id           TEXT PRIMARY KEY,
+  olusturuldu  TEXT NOT NULL DEFAULT (datetime('now')),
+  name         TEXT NOT NULL,
+  phone        TEXT NOT NULL DEFAULT '',
+  email        TEXT NOT NULL DEFAULT '',
+  message      TEXT NOT NULL DEFAULT '',
+  -- E-posta gonderildi mi? 0: gonderilemedi/yapilandirilmadi, 1: gonderildi
+  mail_gitti   INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_tarih ON messages (olusturuldu DESC);
+
 -- Başarısız giriş denemeleri (kaba kuvvet sınırlaması).
 CREATE TABLE IF NOT EXISTS login_attempts (
   ip           TEXT PRIMARY KEY,

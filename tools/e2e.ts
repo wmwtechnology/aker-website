@@ -71,7 +71,8 @@ async function calistir(): Promise<void> {
   sonuc('ana sayfa 200 döner', ana.status === 200, String(ana.status));
   sonuc('sunucu içeriği enjekte etti', ana.headers.get('x-icerik-surum') !== null);
   sonuc('54 referans logosu basıldı', sayac(ana.govde, /class="client-logo"/g) === 54, String(sayac(ana.govde, /class="client-logo"/g)));
-  sonuc('3 haber kartı basıldı', sayac(ana.govde, /class="news-card-title"/g) === 3);
+  sonuc('4 haber kartı basıldı', sayac(ana.govde, /class="news-card-title"/g) === 4, String(sayac(ana.govde, /class="news-card-title"/g)));
+  sonuc('haber kartları dış bağlantıya gidiyor', sayac(ana.govde, /<a class="news-card"/g) === 4);
   sonuc('3 ilan kartı basıldı', sayac(ana.govde, /class="career-card-title"/g) === 3);
 
   const ekip = await iste('/ekibimiz');
@@ -211,6 +212,47 @@ async function calistir(): Promise<void> {
   await iste('/api/basvuru', { method: 'POST', body: balKupu });
   const basvurular2 = (await iste('/api/admin/applications')).json['kayitlar'] as { name: string }[];
   sonuc('bal küpü dolu başvuru kaydedilmedi', !basvurular2.some((b) => b.name === 'Bot'));
+
+  // --- İletişim formu ---
+  console.log('\nİletişim formu');
+  const mesajGonder = await iste('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'Mesaj Sınama',
+      phone: '5551112233',
+      email: 'sinama@example.com',
+      message: 'E-posta ayarı yokken mesaj kaydediliyor mu?',
+    }),
+  });
+  sonuc('form gönderimi başarılı dönüyor', mesajGonder.status === 200, String(mesajGonder.status));
+
+  const mesajlar = (await iste('/api/admin/messages')).json['kayitlar'] as
+    | { id: string; name: string; mail_gitti: number }[]
+    | undefined;
+  const mesaj = mesajlar?.find((m) => m.name === 'Mesaj Sınama');
+  sonuc('mesaj panele düştü (e-posta olmasa da kaybolmuyor)', Boolean(mesaj));
+  sonuc('e-posta durumu kayıtlı', mesaj?.mail_gitti === 0);
+
+  const botMesaj = new URLSearchParams();
+  await iste('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'Mesaj Bot',
+      phone: '5550000000',
+      email: 'bot@example.com',
+      message: String(botMesaj),
+      company_website: 'https://spam.example',
+    }),
+  });
+  const mesajlar2 = (await iste('/api/admin/messages')).json['kayitlar'] as { name: string }[] | undefined;
+  sonuc('bal küpü dolu mesaj kaydedilmedi', !mesajlar2?.some((m) => m.name === 'Mesaj Bot'));
+
+  if (mesaj) {
+    const silMesaj = await iste(`/api/admin/messages/${mesaj.id}`, { method: 'DELETE' });
+    sonuc('mesaj silinebiliyor', silMesaj.status === 200);
+  }
 
   // --- Temizlik ---
   console.log('\nTemizlik ve çıkış');

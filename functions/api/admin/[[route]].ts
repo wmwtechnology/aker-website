@@ -48,6 +48,10 @@ export const onRequest = async (ctx: Ctx): Promise<Response> => {
     return applicationsRoute(request, env, second);
   }
 
+  if (first === 'messages') {
+    return messagesRoute(request, env, second);
+  }
+
   if (first === 'cv') {
     if (request.method !== 'GET') return json({ error: 'method' }, 405);
     return serveCv(env, parts.slice(1).join('/'));
@@ -176,6 +180,28 @@ async function applicationsRoute(request: Request, env: Env, id: string | undefi
     if (!sonuc.meta.changes) return json({ error: 'Kayıt bulunamadı.' }, 404);
 
     if (kayit?.cvKey) await deleteObject(env, kayit.cvKey);
+    return json({ ok: true });
+  }
+
+  return json({ error: 'method' }, 405);
+}
+
+// ---------------------------------------------------------
+// İletişim formu mesajları
+// ---------------------------------------------------------
+async function messagesRoute(request: Request, env: Env, id: string | undefined): Promise<Response> {
+  if (request.method === 'GET') {
+    const sonuc = await env.DB.prepare(
+      `SELECT id, olusturuldu, name, phone, email, message, mail_gitti
+       FROM messages ORDER BY olusturuldu DESC LIMIT 500`,
+    ).all();
+    return json({ kayitlar: sonuc.results ?? [] });
+  }
+
+  if (request.method === 'DELETE') {
+    if (!isValidId(id)) return json({ error: 'Geçersiz kimlik.' }, 400);
+    const sonuc = await env.DB.prepare('DELETE FROM messages WHERE id = ?').bind(id).run();
+    if (!sonuc.meta.changes) return json({ error: 'Kayıt bulunamadı.' }, 404);
     return json({ ok: true });
   }
 

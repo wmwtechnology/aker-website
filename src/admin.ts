@@ -129,16 +129,28 @@ const ORDER_UP_SVG =
 const ORDER_DOWN_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 
+interface Mesaj {
+  id: string;
+  olusturuldu: string;
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+  mail_gitti: number;
+}
+
 const state: {
   section: string;
   editingId: string | null;
   kayitlar: Kayit[];
   basvurular: Basvuru[];
+  mesajlar: Mesaj[];
 } = {
   section: 'slides',
   editingId: null,
   kayitlar: [],
   basvurular: [],
+  mesajlar: [],
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -260,6 +272,15 @@ async function renderSection(): Promise<void> {
       const { kayitlar } = await api.listele<Basvuru>('applications');
       state.basvurular = kayitlar;
       renderApplications(content);
+      return;
+    }
+
+    if (state.section === 'messages') {
+      titleEl.textContent = 'İletişim Mesajları';
+      addBtn.style.display = 'none';
+      const { kayitlar } = await api.listele<Mesaj>('messages');
+      state.mesajlar = kayitlar;
+      renderMessages(content);
       return;
     }
 
@@ -410,6 +431,70 @@ function renderApplications(content: HTMLElement): void {
       .then(() => renderSection())
       .catch(hatayiIsle);
   });
+}
+
+// ---------------------------------------------------------
+// İletişim mesajları
+// ---------------------------------------------------------
+function renderMessages(content: HTMLElement): void {
+  const mesajlar = state.mesajlar;
+  const countHtml = `<div class="admin-record-count">Toplam Kayıt Sayısı : ${mesajlar.length}</div>`;
+
+  if (mesajlar.length === 0) {
+    content.innerHTML = `${countHtml}<div class="admin-empty">Henüz mesaj yok.</div>`;
+    return;
+  }
+
+  const rows = mesajlar
+    .map(
+      (m) =>
+        '<tr>' +
+        `<td>${formatDate(m.olusturuldu)}</td>` +
+        `<td>${escapeHtml(m.name)}</td>` +
+        `<td><a href="tel:${escapeAttr(m.phone)}">${escapeHtml(m.phone)}</a></td>` +
+        `<td><a href="mailto:${escapeAttr(m.email)}">${escapeHtml(m.email)}</a></td>` +
+        `<td>${escapeHtml(m.message.length > 90 ? `${m.message.slice(0, 90)}…` : m.message)}</td>` +
+        `<td>${m.mail_gitti ? 'Gönderildi' : 'Yalnızca kayıt'}</td>` +
+        '<td class="admin-row-actions">' +
+        `<button class="admin-icon-btn" data-action="view-msg" data-id="${escapeAttr(m.id)}">Detay</button>` +
+        `<button class="admin-icon-btn admin-icon-btn-danger" data-action="delete-msg" data-id="${escapeAttr(m.id)}">Sil</button>` +
+        '</td></tr>',
+    )
+    .join('');
+
+  content.innerHTML =
+    `${countHtml}<table class="admin-table"><thead><tr>` +
+    '<th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>E-Posta</th><th>Mesaj</th><th>E-Posta Durumu</th><th></th>' +
+    `</tr></thead><tbody>${rows}</tbody></table>`;
+
+  bindRowAction(content, 'view-msg', (id) => {
+    const mesaj = mesajlar.find((m) => m.id === id);
+    if (mesaj) showMessageDetail(mesaj);
+  });
+
+  bindRowAction(content, 'delete-msg', (id) => {
+    if (!confirm('Bu mesajı silmek istediğinize emin misiniz?')) return;
+    api
+      .sil('messages', id)
+      .then(() => renderSection())
+      .catch(hatayiIsle);
+  });
+}
+
+function showMessageDetail(mesaj: Mesaj): void {
+  const body = byId('app-detail-body');
+  const modal = byId('app-detail-modal');
+  if (!body || !modal) return;
+
+  body.innerHTML =
+    `<div class="admin-detail-row"><strong>Tarih:</strong> ${formatDate(mesaj.olusturuldu)}</div>` +
+    `<div class="admin-detail-row"><strong>Ad Soyad:</strong> ${escapeHtml(mesaj.name)}</div>` +
+    `<div class="admin-detail-row"><strong>Telefon:</strong> <a href="tel:${escapeAttr(mesaj.phone)}">${escapeHtml(mesaj.phone)}</a></div>` +
+    `<div class="admin-detail-row"><strong>E-Posta:</strong> <a href="mailto:${escapeAttr(mesaj.email)}">${escapeHtml(mesaj.email)}</a></div>` +
+    `<div class="admin-detail-row"><strong>Mesaj:</strong><br>${escapeHtml(mesaj.message)}</div>` +
+    `<div class="admin-detail-row"><strong>E-Posta Durumu:</strong> ${mesaj.mail_gitti ? 'Bildirim e-postası gönderildi' : 'Bildirim e-postası gönderilmedi (yalnızca kayıt)'}</div>`;
+
+  modal.style.display = 'flex';
 }
 
 function initAppDetailModal(): void {
