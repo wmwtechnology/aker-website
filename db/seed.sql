@@ -82,10 +82,11 @@ INSERT OR IGNORE INTO documents (id, sira, title, image) VALUES ('doc-11', 10, '
 INSERT OR IGNORE INTO documents (id, sira, title, image) VALUES ('doc-12', 11, 'Kalite Yönetim Sistemi', '/img/doc-12.webp');
 INSERT OR IGNORE INTO documents (id, sira, title, image) VALUES ('doc-13', 12, 'Müşteri Memnuniyeti Yönetim Sistemi', '/img/doc-13.webp');
 
--- news (3 kayıt)
-INSERT OR IGNORE INTO news (id, sira, title, text, image, link) VALUES ('news-1', 0, 'Bilkent de ''Aker'' dedi!', 'Türkiye''deki önemli projelerden adından başarıyla söz ettiren Gebze menşeli Aker OSGB, sınırları aşmaya devam ediyor.', '/img/news-1.webp', '');
-INSERT OR IGNORE INTO news (id, sira, title, text, image, link) VALUES ('news-2', 1, 'AKER OSGB, Bilkent Üniversitesi''nde PCR testi yaptı!', 'Bölgemizin gururu olan ve Türkiye''de önemli projeler imza atan Aker OSGB, bu sefer Ankara''da bulunan Bilkent Üniversitesi''ndeydi.', '/img/news-2.webp', '');
-INSERT OR IGNORE INTO news (id, sira, title, text, image, link) VALUES ('news-3', 2, 'Aker OSGB günde 5 bin korona testi yapıyor', 'Ortak Sağlık ve Güvenlik Birimi (OSGB) firması Aker OSGB, uluslararası alanda önemli bir başarıya imza atarak Gebze''de günlük 5 bin Covid-19...', '/img/news-3.webp', '');
+-- news (4 kayıt)
+INSERT OR IGNORE INTO news (id, sira, title, text, image, link) VALUES ('news-1', 0, 'Bilkent de ''Aker'' dedi!', 'Türkiye''deki önemli projelerden adından başarıyla söz ettiren Gebze menşeli Aker OSGB, sınırları aşmaya devam ediyor.', '/img/news-1.webp', 'https://www.hedefgazetesi.com.tr/bilkent-de-aker-dedi-102310-haberi');
+INSERT OR IGNORE INTO news (id, sira, title, text, image, link) VALUES ('news-2', 1, 'AKER OSGB, Bilkent Üniversitesi''nde PCR testi yaptı!', 'Bölgemizin gururu olan ve Türkiye''de önemli projeler imza atan Aker OSGB, bu sefer Ankara''da bulunan Bilkent Üniversitesi''ndeydi.', '/img/news-2.webp', 'https://www.daricagazetesi.com.tr/aker-osgb-bilkent-universitesi-nde-pcr-testi-yapti/24396/');
+INSERT OR IGNORE INTO news (id, sira, title, text, image, link) VALUES ('news-3', 2, 'Aker OSGB günde 5 bin korona testi yapıyor', 'Ortak Sağlık ve Güvenlik Birimi (OSGB) firması Aker OSGB, uluslararası alanda önemli bir başarıya imza atarak Gebze''de günlük 5 bin Covid-19...', '/img/news-3.webp', 'https://www.daricagazetesi.com.tr/aker-osgb-gunde-5-bin-korona-testi-yapiyor/16812/');
+INSERT OR IGNORE INTO news (id, sira, title, text, image, link) VALUES ('news-4', 3, 'Aker OSGB, büyük etkinliklerde boy gösteriyor', 'Bölgemizin gurur veren firmalarından AKER OSGB, İstanbul Lütfi Kırdar Uluslararası Kongre ve Sergi Sarayı''nda düzenlenen etkinliklerde Covid-19 PCR taraması yapmaya başladı.', '/img/news-4.webp', 'https://www.daricagazetesi.com.tr/aker-osgb-buyuk-etkinliklerde-boy-gosteriyor/23988/');
 
 -- team (11 kayıt)
 INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-1', 0, 'EBUBEKİR KAPLAN', 'İSG KATİP MESUL MÜDÜR', '/img/team-1.webp');

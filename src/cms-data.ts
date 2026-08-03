@@ -172,19 +172,29 @@ export const DEFAULT_DATA: CmsData = {
       id: 'news-1',
       title: 'Bilkent de \'Aker\' dedi!',
       text: 'Türkiye\'deki önemli projelerden adından başarıyla söz ettiren Gebze menşeli Aker OSGB, sınırları aşmaya devam ediyor.',
-      image: '/img/news-1.webp'
+      image: '/img/news-1.webp',
+      link: 'https://www.hedefgazetesi.com.tr/bilkent-de-aker-dedi-102310-haberi'
     },
     {
       id: 'news-2',
       title: 'AKER OSGB, Bilkent Üniversitesi\'nde PCR testi yaptı!',
       text: 'Bölgemizin gururu olan ve Türkiye\'de önemli projeler imza atan Aker OSGB, bu sefer Ankara\'da bulunan Bilkent Üniversitesi\'ndeydi.',
-      image: '/img/news-2.webp'
+      image: '/img/news-2.webp',
+      link: 'https://www.daricagazetesi.com.tr/aker-osgb-bilkent-universitesi-nde-pcr-testi-yapti/24396/'
     },
     {
       id: 'news-3',
       title: 'Aker OSGB günde 5 bin korona testi yapıyor',
       text: 'Ortak Sağlık ve Güvenlik Birimi (OSGB) firması Aker OSGB, uluslararası alanda önemli bir başarıya imza atarak Gebze\'de günlük 5 bin Covid-19...',
-      image: '/img/news-3.webp'
+      image: '/img/news-3.webp',
+      link: 'https://www.daricagazetesi.com.tr/aker-osgb-gunde-5-bin-korona-testi-yapiyor/16812/'
+    },
+    {
+      id: 'news-4',
+      title: 'Aker OSGB, büyük etkinliklerde boy gösteriyor',
+      text: "Bölgemizin gurur veren firmalarından AKER OSGB, İstanbul Lütfi Kırdar Uluslararası Kongre ve Sergi Sarayı'nda düzenlenen etkinliklerde Covid-19 PCR taraması yapmaya başladı.",
+      image: '/img/news-4.webp',
+      link: 'https://www.daricagazetesi.com.tr/aker-osgb-buyuk-etkinliklerde-boy-gosteriyor/23988/'
     }
   ],
 

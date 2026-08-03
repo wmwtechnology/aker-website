@@ -360,6 +360,10 @@ export const IMAGE_SIZES: Record<string, ImageSize | undefined> = {
     "width": 512,
     "height": 192
   },
+  "news-4.webp": {
+    "width": 512,
+    "height": 217
+  },
   "og-gorsel-kaynak.webp": {
     "width": 1200,
     "height": 720
