@@ -213,6 +213,32 @@ sunar. Böylece deploy davranışı TypeScript öncesiyle aynı kalır.
 5. Canlıya alındıktan sonra: Search Console + Bing Webmaster kurulumu, sitemap gönderimi,
    Google Business Profile'da NAP'ın `tools/site.ts`'teki adreslerle birebir aynı olması.
 
+## YARININ İLK İŞİ: iletişim formu e-postası
+
+Canlıda `CONTACT_TO_EMAIL` ve `MAIL_FROM` **tanımlı değil**. Bu hâliyle:
+
+- İletişim formu gönderilemiyor; kullanıcı "Gönderilemedi, lütfen tekrar deneyin." görüyor.
+- İş başvuruları panele kaydediliyor ama bildirim e-postası gitmiyor.
+
+Alan adı Pages'e bağlanmadan **önce** çözülmeli, yoksa siteye giren ilk müşteri
+formu doldurduğunda hata alır.
+
+Karar verilecekler:
+1. **Alıcı** — `info@akerosgb.com.tr` (kullanıcı bunu seçti).
+2. **Gönderen** — Resend'de hangi alan adı doğrulanmış? `flowick.com` doğrulanmışsa
+   `no-reply@flowick.com` hemen çalışır. `akerosgb.com.tr` tercih edilecekse önce
+   Resend'e eklenip SPF/DKIM kayıtları girilmeli (alan adı zaten Cloudflare'de).
+
+Değerler belirlenince:
+
+```
+npx wrangler pages secret put CONTACT_TO_EMAIL --project-name aker-website
+npx wrangler pages secret put MAIL_FROM --project-name aker-website
+npx wrangler pages deploy . --project-name aker-website --branch master
+```
+
+Sonrasında gerçek bir gönderim denemesi yapılıp kutuya düştüğü doğrulanmalı.
+
 ## AÇIK İŞLER / DIŞ GİRDİ BEKLEYENLER
 
 - **Mevzuat rakamlarının doğrulanması (ÖNEMLİ).** Hizmet ve SSS sayfalarındaki süreler
