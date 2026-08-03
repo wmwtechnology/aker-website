@@ -5,7 +5,41 @@
 // sayfanın gövdesini oluşturur: h2 + paragraf + liste.
 // =========================================================
 
-export const PAGES = [
+import type { FaqEntry } from './hizmetler.ts';
+import type { LinkItem } from '../site.ts';
+
+/** Bir içerik sayfasındaki tek bir bölüm. */
+export interface ContentBlock {
+  h2: string;
+  p?: string[];
+  list?: string[];
+  links?: LinkItem[];
+  /** Gösterilecek şubelerin kimlikleri. */
+  branches?: string[];
+  /** true ise hizmet kartları listesi basılır. */
+  services?: boolean;
+  /** true ise telefon/e-posta/WhatsApp listesi basılır. */
+  contact?: boolean;
+  /** true ise iletişim formu basılır. */
+  form?: boolean;
+  /** true ise açık pozisyonlar listesi basılır. */
+  careers?: boolean;
+}
+
+export interface ContentPage {
+  /** URL parçası ve dosya adı. */
+  slug: string;
+  h1: string;
+  title: string;
+  description: string;
+  lead: string;
+  blocks?: ContentBlock[];
+  /** true ise sayfa FAQPage şemasıyla işaretlenir. */
+  faqPage?: boolean;
+  faq?: FaqEntry[];
+}
+
+export const PAGES: ContentPage[] = [
   // -------------------------------------------------------
   {
     slug: 'hakkimizda',

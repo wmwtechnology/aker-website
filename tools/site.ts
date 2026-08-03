@@ -6,7 +6,40 @@
 // verilerden yapılır. Tek kaynak burasıdır.
 // =========================================================
 
-export const SITE = {
+export interface SiteConfig {
+  origin: string;
+  name: string;
+  legalName: string;
+  fullName: string;
+  founded: string;
+  phone: string;
+  phoneHref: string;
+  whatsapp: string;
+  email: string;
+  locale: string;
+  lang: string;
+  social: [string, string, string];
+  ogImage: string;
+  ogImageSize: { width: number; height: number };
+}
+
+export interface Branch {
+  id: string;
+  name: string;
+  street: string;
+  district: string;
+  city: string;
+  postalCode: string;
+  /** Google Haritalar arama adresi. */
+  maps: string;
+}
+
+export interface LinkItem {
+  href: string;
+  label: string;
+}
+
+export const SITE: SiteConfig = {
   origin: 'https://akerosgb.com.tr',
   name: 'AKER OSGB',
   legalName: 'AKER Ortak Sağlık Güvenlik Birimi Dnş. Özel Sağlık Hiz. Tic. Ltd. Şti.',
@@ -30,7 +63,7 @@ export const SITE = {
 // ---------------------------------------------------------
 // Şubeler (NAP - isim, adres, telefon tutarlılığı buradan gelir)
 // ---------------------------------------------------------
-export const BRANCHES = [
+export const BRANCHES: Branch[] = [
   {
     id: 'merkez',
     name: 'AKER OSGB Merkez Şube',
@@ -72,7 +105,7 @@ export const BRANCHES = [
 // ---------------------------------------------------------
 // Üst menü
 // ---------------------------------------------------------
-export const NAV = [
+export const NAV: LinkItem[] = [
   { href: '/hakkimizda', label: 'Hakkımızda' },
   { href: '/hizmetlerimiz', label: 'Hizmetlerimiz' },
   { href: '/belgelerimiz', label: 'Belgelerimiz' },
@@ -83,7 +116,7 @@ export const NAV = [
 ];
 
 // Alt bilgideki hizmet bağlantıları için kısa liste
-export const FOOTER_LINKS = [
+export const FOOTER_LINKS: LinkItem[] = [
   { href: '/hizmetlerimiz/is-guvenligi-uzmanligi', label: 'İş Güvenliği Uzmanlığı' },
   { href: '/hizmetlerimiz/isyeri-hekimligi', label: 'İşyeri Hekimliği' },
   { href: '/hizmetlerimiz/risk-degerlendirmesi', label: 'Risk Değerlendirmesi' },

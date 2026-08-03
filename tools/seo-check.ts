@@ -5,7 +5,7 @@
 // raporlar: eksik alt, geçersiz JSON-LD, kırık yerel bağlantı,
 // kalan Bubble adresi, tekrar eden başlık/açıklama.
 //
-// Kullanım: node tools/seo-check.mjs
+// Kullanım: node tools/seo-check.ts   (veya: npm run check)
 // =========================================================
 
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-function htmlFiles(dir = ROOT, acc = []) {
+function htmlFiles(dir: string = ROOT, acc: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     if (['node_modules', '.git', 'tools', 'img', 'css', 'js', 'functions'].includes(entry)) continue;
     const full = path.join(dir, entry);
@@ -24,9 +24,9 @@ function htmlFiles(dir = ROOT, acc = []) {
   return acc;
 }
 
-const problems = [];
-const titles = new Map();
-const descriptions = new Map();
+const problems: string[] = [];
+const titles = new Map<string, string>();
+const descriptions = new Map<string, string>();
 
 for (const file of htmlFiles()) {
   const rel = path.relative(ROOT, file).replace(/\\/g, '/');
@@ -41,9 +41,9 @@ for (const file of htmlFiles()) {
   // 2) JSON-LD geçerliliği
   for (const m of src.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     try {
-      JSON.parse(m[1]);
+      JSON.parse(m[1] ?? '');
     } catch (e) {
-      problems.push(`${rel}: JSON-LD ayrıştırılamadı (${e.message})`);
+      problems.push(`${rel}: JSON-LD ayrıştırılamadı (${(e as Error).message})`);
     }
   }
 
@@ -76,7 +76,7 @@ for (const file of htmlFiles()) {
 
   // 5) yerel bağlantı ve varlıkların gerçekten var olması
   for (const m of src.matchAll(/(?:href|src)="(\/[^"#?]*)"/g)) {
-    const target = m[1];
+    const target = m[1] ?? '';
     if (target.startsWith('//')) continue;
     const candidates = [
       path.join(ROOT, target),

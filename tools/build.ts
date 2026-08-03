@@ -3,48 +3,92 @@
 // =========================================================
 // İki iş yapar:
 //   1. İçerik sayfalarını (hizmet, lokasyon, SSS, iletişim...)
-//      site.mjs ve content/ altındaki verilerden üretir.
+//      site.ts ve content/ altındaki verilerden üretir.
 //   2. Elle yazılmış sayfalardaki (index, belgelerimiz, ekibimiz,
 //      isbasvuru) <!-- head:start --> ... gibi işaretli blokları
 //      aynı kaynaktan güncelleyerek tutarlılığı korur.
 // Ayrıca sitemap.xml dosyasını yazar.
 //
-// Kullanım: node tools/build.mjs
+// Kullanım: node tools/build.ts   (veya: npm run pages)
 // =========================================================
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE, BRANCHES, NAV, FOOTER_LINKS } from './site.mjs';
-import { SERVICES } from './content/hizmetler.mjs';
-import { PAGES } from './content/sayfalar.mjs';
+import { SITE, BRANCHES, NAV, FOOTER_LINKS, type Branch } from './site.ts';
+import { SERVICES, type FaqEntry, type Service } from './content/hizmetler.ts';
+import { PAGES, type ContentBlock } from './content/sayfalar.ts';
+import { DEFAULT_DATA } from '../src/cms-data.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SIZES = JSON.parse(readFileSync(path.join(ROOT, 'tools', 'image-sizes.json'), 'utf8'));
-const BRANCH_BY_ID = Object.fromEntries(BRANCHES.map((b) => [b.id, b]));
+
+interface ImageSize {
+  width: number;
+  height: number;
+}
+
+const SIZES = JSON.parse(readFileSync(path.join(ROOT, 'tools', 'image-sizes.json'), 'utf8')) as Record<
+  string,
+  ImageSize
+>;
+
+const BRANCH_BY_ID: Record<string, Branch> = Object.fromEntries(BRANCHES.map((b) => [b.id, b]));
+
+/** Merkez şube; Organization şemasının adresi buradan gelir. */
+const HQ: Branch = BRANCHES[0]!;
+
+/** Sayfa yolu ve başlıktan oluşan kırıntı öğesi. */
+interface Crumb {
+  href: string;
+  label: string;
+}
+
+/** Bir sayfanın üretim için gereken bütün bilgileri. */
+interface PageSpec {
+  path: string;
+  file: string;
+  title: string;
+  description: string;
+  h1?: string;
+  lead?: string;
+  ogTitle?: string;
+  ogType?: string;
+  breadcrumb?: Crumb[];
+  schema?: Record<string, unknown>[];
+  priority?: string;
+  noindex?: boolean;
+  skipSitemap?: boolean;
+  cta?: boolean;
+}
 
 // ---------------------------------------------------------
 // Yardımcılar
 // ---------------------------------------------------------
-const esc = (s) =>
+const esc = (s: unknown): string =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-function img(name, { alt, className, lazy = true, sizesAttr = '' }) {
+interface ImgOptions {
+  alt: string;
+  className?: string;
+  lazy?: boolean;
+}
+
+function img(name: string, { alt, className, lazy = true }: ImgOptions): string {
   const file = `${name}.webp`;
   const size = SIZES[file];
   const dims = size ? ` width="${size.width}" height="${size.height}"` : '';
   const cls = className ? ` class="${className}"` : '';
   const loading = lazy ? ' loading="lazy" decoding="async"' : ' decoding="async"';
-  return `<img src="/img/${file}" alt="${esc(alt)}"${dims}${cls}${loading}${sizesAttr}>`;
+  return `<img src="/img/${file}" alt="${esc(alt)}"${dims}${cls}${loading}>`;
 }
 
-const abs = (p) => (p.startsWith('http') ? p : SITE.origin + (p.startsWith('/') ? p : '/' + p));
-const fullAddress = (b) => `${b.street}, ${b.postalCode} ${b.district}/${b.city}`;
+const abs = (p: string): string => (p.startsWith('http') ? p : SITE.origin + (p.startsWith('/') ? p : `/${p}`));
+const fullAddress = (b: Branch): string => `${b.street}, ${b.postalCode} ${b.district}/${b.city}`;
 
 // ---------------------------------------------------------
 // JSON-LD parçaları
 // ---------------------------------------------------------
-function organizationNode() {
+function organizationNode(): Record<string, unknown> {
   return {
     '@type': 'Organization',
     '@id': `${SITE.origin}/#organization`,
@@ -64,10 +108,10 @@ function organizationNode() {
     sameAs: SITE.social,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: BRANCHES[0].street,
-      addressLocality: BRANCHES[0].district,
-      addressRegion: BRANCHES[0].city,
-      postalCode: BRANCHES[0].postalCode,
+      streetAddress: HQ.street,
+      addressLocality: HQ.district,
+      addressRegion: HQ.city,
+      postalCode: HQ.postalCode,
       addressCountry: 'TR',
     },
     contactPoint: {
@@ -81,7 +125,7 @@ function organizationNode() {
   };
 }
 
-function websiteNode() {
+function websiteNode(): Record<string, unknown> {
   return {
     '@type': 'WebSite',
     '@id': `${SITE.origin}/#website`,
@@ -92,7 +136,7 @@ function websiteNode() {
   };
 }
 
-function branchNode(b) {
+function branchNode(b: Branch): Record<string, unknown> {
   return {
     '@type': 'LocalBusiness',
     '@id': `${SITE.origin}/subelerimiz#${b.id}`,
@@ -118,11 +162,11 @@ function branchNode(b) {
   };
 }
 
-function breadcrumbNode(trail) {
+function breadcrumbNode(trail: Crumb[]): Record<string, unknown> {
   return {
     '@type': 'BreadcrumbList',
     '@id': `${SITE.origin}/#breadcrumb`,
-    itemListElement: trail.map((item, i) => ({
+    itemListElement: trail.map((item: Crumb, i: number) => ({
       '@type': 'ListItem',
       position: i + 1,
       name: item.label,
@@ -131,10 +175,10 @@ function breadcrumbNode(trail) {
   };
 }
 
-function faqNode(faq) {
+function faqNode(faq: FaqEntry[]): Record<string, unknown> {
   return {
     '@type': 'FAQPage',
-    mainEntity: faq.map((f) => ({
+    mainEntity: faq.map((f: FaqEntry) => ({
       '@type': 'Question',
       name: f.q,
       acceptedAnswer: { '@type': 'Answer', text: f.a },
@@ -142,7 +186,7 @@ function faqNode(faq) {
   };
 }
 
-function serviceNode(service) {
+function serviceNode(service: Service): Record<string, unknown> {
   return {
     '@type': 'Service',
     '@id': `${SITE.origin}/hizmetlerimiz/${service.slug}#service`,
@@ -162,7 +206,7 @@ function serviceNode(service) {
 // ---------------------------------------------------------
 // <head> bloğu
 // ---------------------------------------------------------
-function headBlock(page) {
+function headBlock(page: PageSpec): string {
   const canonical = abs(page.path);
   const ogImage = abs('/' + SITE.ogImage);
   const graph = [organizationNode(), websiteNode(), ...(page.schema || [])];
@@ -210,7 +254,7 @@ ${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }, null, 2)
 // ---------------------------------------------------------
 // Menü ve alt bilgi
 // ---------------------------------------------------------
-function navBlock(currentPath) {
+function navBlock(currentPath: string): string {
   const links = NAV.map((item) => {
     const active = item.href === currentPath ? ' active' : '';
     const aria = item.href === currentPath ? ' aria-current="page"' : '';
@@ -237,7 +281,7 @@ ${links}
 </header>`;
 }
 
-function footerBlock() {
+function footerBlock(): string {
   const links = FOOTER_LINKS.map(
     (l) => `        <li><a href="${l.href}">${l.label}</a></li>`
   ).join('\n');
@@ -289,7 +333,7 @@ ${branches}
 </footer>`;
 }
 
-function whatsappBlock() {
+function whatsappBlock(): string {
   return `<div class="bubble-element wpp-icon-wrapper">
   <div id="wpplugin" class="floating-wpp">
     <a class="floating-wpp-button wpp-button-bg" href="https://wa.me/${SITE.whatsapp}" target="_blank" rel="noopener" aria-label="WhatsApp ile iletişime geçin">
@@ -305,7 +349,7 @@ function whatsappBlock() {
 // ---------------------------------------------------------
 // Gövde blokları
 // ---------------------------------------------------------
-function branchCard(b) {
+function branchCard(b: Branch): string {
   return `      <li class="branch-card">
         <h3 class="branch-name">${esc(b.name)}</h3>
         <address class="branch-address">${esc(fullAddress(b))}</address>
@@ -316,7 +360,7 @@ function branchCard(b) {
       </li>`;
 }
 
-function serviceCards() {
+function serviceCards(): string {
   return `    <ul class="service-card-list">
 ${SERVICES.map(
     (s) => `      <li class="service-card">
@@ -328,7 +372,7 @@ ${SERVICES.map(
     </ul>`;
 }
 
-function faqList(faq) {
+function faqList(faq: FaqEntry[]): string {
   return `    <div class="faq-list">
 ${faq
     .map(
@@ -341,7 +385,7 @@ ${faq
     </div>`;
 }
 
-function contactBlock() {
+function contactBlock(): string {
   return `    <ul class="contact-quick-list">
       <li><span class="contact-quick-label">Telefon</span><a class="contact-quick-value" href="${SITE.phoneHref}">${SITE.phone}</a></li>
       <li><span class="contact-quick-label">E-Posta</span><a class="contact-quick-value" href="mailto:${SITE.email}">${SITE.email}</a></li>
@@ -349,7 +393,7 @@ function contactBlock() {
     </ul>`;
 }
 
-function contactFormBlock() {
+function contactFormBlock(): string {
   return `    <div class="bubble-element contact-form-block content-form">
       <input type="text" name="company_website" tabindex="-1" autocomplete="off" class="hp-field" aria-hidden="true">
       <div class="contact-field">
@@ -383,29 +427,14 @@ function contactFormBlock() {
     </div>`;
 }
 
-// ---------------------------------------------------------
-// js/data.js içindeki varsayılan içerik (tek kaynak)
-// ---------------------------------------------------------
-let DATA_CACHE = null;
-function loadData() {
-  if (DATA_CACHE) return DATA_CACHE;
-  const src = readFileSync(path.join(ROOT, 'js', 'data.js'), 'utf8');
-  const start = src.indexOf('var DEFAULT_DATA = ');
-  const end = src.indexOf('\n  };', start);
-  if (start === -1 || end === -1) throw new Error('data.js içinde DEFAULT_DATA bulunamadı');
-  const literal = src.slice(start + 'var DEFAULT_DATA = '.length, end + 4).replace(/;\s*$/, '');
-  DATA_CACHE = new Function(`return ${literal}`)();
-  return DATA_CACHE;
-}
-
 // Yerel görsel yolundan (/img/x.webp) boyut niteliklerini üretir
-function dimsFor(src) {
+function dimsFor(src: string): string {
   const size = SIZES[src.replace('/img/', '')];
   return size ? ` width="${size.width}" height="${size.height}"` : '';
 }
 
-function careerCards() {
-  const cards = loadData().careers.map(
+function careerCards(): string {
+  const cards = DEFAULT_DATA.careers.map(
     (c) => `      <li class="career-item">
         <div class="career-item-image"><img src="${c.cardImage}" alt="${esc(c.title)}"${dimsFor(c.cardImage)} loading="lazy" decoding="async"></div>
         <div class="career-item-body">
@@ -421,7 +450,7 @@ function careerCards() {
 // ---------------------------------------------------------
 // Ana sayfa ve iç sayfalardaki statik içerik blokları
 // ---------------------------------------------------------
-function servicesGridBlock() {
+function servicesGridBlock(): string {
   return `      <ul class="bubble-element services-grid">
 ${SERVICES.map(
     (s) => `        <li class="service-item">
@@ -436,8 +465,8 @@ ${SERVICES.map(
       </ul>`;
 }
 
-function newsGridBlock() {
-  const news = loadData().news;
+function newsGridBlock(): string {
+  const news = DEFAULT_DATA.news;
   return `      <div class="bubble-element news-grid">
 ${news
     .map((n) => {
@@ -460,8 +489,8 @@ ${news
       </div>`;
 }
 
-function careersGridBlock() {
-  const careers = loadData().careers;
+function careersGridBlock(): string {
+  const careers = DEFAULT_DATA.careers;
   return `      <div class="bubble-element careers-grid">
 ${careers
     .map(
@@ -480,8 +509,8 @@ ${careers
       </div>`;
 }
 
-function clientsBlock() {
-  const clients = loadData().clients;
+function clientsBlock(): string {
+  const clients = DEFAULT_DATA.clients;
   return `      <div class="swiper-wrapper clients-slides-wrapper">
 ${clients
     .map(
@@ -491,8 +520,8 @@ ${clients
       </div>`;
 }
 
-function documentsGridBlock() {
-  const docs = loadData().documents;
+function documentsGridBlock(): string {
+  const docs = DEFAULT_DATA.documents;
   return `    <div class="bubble-element documents-grid">
 ${docs
     .map(
@@ -505,8 +534,8 @@ ${docs
     </div>`;
 }
 
-function teamGridBlock() {
-  const team = loadData().team;
+function teamGridBlock(): string {
+  const team = DEFAULT_DATA.team;
   return `    <div class="bubble-element team-grid">
 ${team
     .map(
@@ -522,7 +551,7 @@ ${team
 
 const ICON_PIN = '<svg viewBox="0 0 24 24" class="location-svg" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>';
 
-function contactInfoBlock() {
+function contactInfoBlock(): string {
   const locations = BRANCHES.map(
     (b) => `        <a class="location-item" href="${b.maps}" target="_blank" rel="noopener">
           <div class="location-icon">${ICON_PIN}</div>
@@ -572,13 +601,13 @@ ${socials}
     </div>`;
 }
 
-function renderBlocks(blocks) {
+function renderBlocks(blocks: ContentBlock[]): string {
   return blocks
     .map((b) => {
       const parts = [`    <h2>${esc(b.h2)}</h2>`];
       if (b.p) parts.push(...b.p.map((t) => `    <p>${esc(t)}</p>`));
       if (b.list) parts.push(`    <ul class="content-list">\n${b.list.map((i) => `      <li>${esc(i)}</li>`).join('\n')}\n    </ul>`);
-      if (b.branches) parts.push(`    <ul class="branch-list">\n${b.branches.map((id) => branchCard(BRANCH_BY_ID[id])).join('\n')}\n    </ul>`);
+      if (b.branches) parts.push(`    <ul class="branch-list">\n${b.branches.map((id) => branchCard(BRANCH_BY_ID[id]!)).join('\n')}\n    </ul>`);
       if (b.services) parts.push(serviceCards());
       if (b.contact) parts.push(contactBlock());
       if (b.form) parts.push(contactFormBlock());
@@ -592,7 +621,7 @@ function renderBlocks(blocks) {
     .join('\n\n');
 }
 
-function breadcrumbHtml(trail) {
+function breadcrumbHtml(trail: Crumb[]): string {
   if (trail.length < 2) return '';
   const items = trail
     .map((t, i) =>
@@ -611,7 +640,7 @@ function breadcrumbHtml(trail) {
 // ---------------------------------------------------------
 // Tam sayfa şablonu
 // ---------------------------------------------------------
-function renderPage(page, bodyHtml) {
+function renderPage(page: PageSpec, bodyHtml: string): string {
   return `<!doctype html>
 <html lang="${SITE.lang}">
 <head>
@@ -650,7 +679,7 @@ ${footerBlock()}
 `;
 }
 
-function ctaBlock() {
+function ctaBlock(): string {
   return `  <aside class="content-cta">
     <h2>İşyeriniz için teklif alın</h2>
     <p>NACE kodunuzu, çalışan sayınızı ve adresinizi iletin; tehlike sınıfınıza göre hesaplanmış teklifi aynı gün paylaşalım.</p>
@@ -665,7 +694,7 @@ function ctaBlock() {
 // ---------------------------------------------------------
 // Üretilecek sayfaların toplanması
 // ---------------------------------------------------------
-const generated = [];
+const generated: { page: PageSpec; html: string }[] = [];
 
 // Hizmet hub sayfası
 {
@@ -718,9 +747,10 @@ for (const s of SERVICES) {
     priority: '0.8',
   };
 
-  const related = (s.related || [])
-    .map((slug) => SERVICES.find((x) => x.slug === slug))
-    .filter(Boolean);
+  const related: Service[] = (s.related ?? []).flatMap((slug) => {
+    const found = SERVICES.find((x) => x.slug === slug);
+    return found ? [found] : [];
+  });
 
   const body = [
     renderBlocks(s.sections),
@@ -778,7 +808,7 @@ for (const p of PAGES) {
 {
   const indexSrc = readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   const m = indexSrc.match(/<div class="kvkk-modal-body">([\s\S]*?)<\/div>/);
-  const raw = m ? m[1].trim() : '';
+  const raw = m?.[1]?.trim() ?? '';
   const paragraphs = raw
     .split(/\n\s*\n/)
     .map((t) => t.trim())
@@ -838,7 +868,7 @@ for (const { page, html } of generated) {
 // ---------------------------------------------------------
 // Elle yazılmış sayfalardaki ortak blokları güncelle
 // ---------------------------------------------------------
-export const MANUAL_PAGES = [
+export const MANUAL_PAGES: PageSpec[] = [
   {
     file: 'index.html',
     path: '/',
@@ -891,7 +921,7 @@ export const MANUAL_PAGES = [
   },
 ];
 
-function injectBlock(src, name, content) {
+function injectBlock(src: string, name: string, content: string): string {
   const re = new RegExp(`(<!-- ${name}:start -->)[\\s\\S]*?(<!-- ${name}:end -->)`);
   if (!re.test(src)) {
     console.log(`  uyarı: ${name} işareti bulunamadı`);
@@ -901,7 +931,7 @@ function injectBlock(src, name, content) {
 }
 
 // Sayfaya özgü statik içerik blokları
-const EXTRA_BLOCKS = {
+const EXTRA_BLOCKS: Record<string, Record<string, () => string>> = {
   'index.html': {
     hizmetler: servicesGridBlock,
     haberler: newsGridBlock,

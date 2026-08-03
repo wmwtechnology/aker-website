@@ -65,6 +65,28 @@ yapılmışsa yeniden çiziyor (`AkerStore.hasCustomData()`).
 - `/gebze-osgb`, `/dilovasi-osgb`, `/kocaeli-osgb`
 - `/hakkimizda`, `/subelerimiz`, `/iletisim`, `/sss`, `/kariyer`, `/kvkk`, `/404`
 
+### 8. TypeScript'e geçiş
+
+Tarayıcı kodu, üretici betikler ve Cloudflare Functions TypeScript'e taşındı.
+HTML ve CSS dosyaları statik kalmaya devam ediyor.
+
+```
+src/            tarayıcı kaynak kodu (TypeScript)
+  content-types.ts  içerik modeli tipleri (tarayıcıdan bağımsız)
+  types.ts          tarayıcı arayüzleri + window global tanımları
+  cms-data.ts       varsayılan içerik (haber, ekip, belge, ilan, referans)
+  data.ts           localStorage CMS deposu
+  dom.ts            küçük DOM yardımcıları
+  script.ts         site davranışı
+  admin.ts          yönetim paneli
+js/             esbuild çıktısı (data.js, script.js, admin.js) - REPOYA DAHİL
+functions/      Cloudflare Pages Functions (.ts)
+tools/          üretici betikler (.ts, Node 24 tip sıyırma ile çalışır)
+```
+
+Üç ayrı tsconfig var, çünkü üç ortamın global tipleri farklı:
+`tsconfig.json` (DOM), `tsconfig.tools.json` (Node), `tsconfig.functions.json` (Workers).
+
 ## Nasıl çalışıyor
 
 Sayfaların ortak bölümleri (head, menü, alt bilgi, WhatsApp butonu, hizmet listesi)
@@ -72,18 +94,28 @@ tek kaynaktan üretilir. HTML dosyalarındaki `<!-- head:start -->` gibi işaret
 arası derleme sırasında doldurulur.
 
 ```
-node tools/build.mjs      # sayfaları ve sitemap.xml'i üretir/günceller
-node tools/seo-check.mjs  # alt, canonical, h1, kırık bağlantı, JSON-LD denetimi
+npm install         # bir kez: typescript, esbuild, tip paketleri
+npm run verify      # tip denetimi + derleme + SEO denetimi (hepsi bir arada)
+
+npm run typecheck   # üç tsconfig için tip denetimi
+npm run bundle      # src/*.ts -> js/*.js (esbuild)
+npm run pages       # sayfaları ve sitemap.xml'i üretir/günceller
+npm run check       # alt, canonical, h1, kırık bağlantı, JSON-LD denetimi
+npm run dev         # http://localhost:8788 önizleme sunucusu
 ```
 
 İçeriği değiştirmek için:
-- Site geneli bilgi (telefon, adres, menü): `tools/site.mjs`
-- Hizmet sayfaları: `tools/content/hizmetler.mjs`
-- Diğer sayfalar: `tools/content/sayfalar.mjs`
-- Haber/ekip/belge/ilan verisi: `js/data.js`
+- Site geneli bilgi (telefon, adres, menü): `tools/site.ts`
+- Hizmet sayfaları: `tools/content/hizmetler.ts`
+- Diğer sayfalar: `tools/content/sayfalar.ts`
+- Haber/ekip/belge/ilan/referans verisi: `src/cms-data.ts`
 
-Değişiklikten sonra **mutlaka `node tools/build.mjs` çalıştırılmalı**, yoksa üretilen
-HTML güncellenmez.
+Değişiklikten sonra **mutlaka `npm run build` çalıştırılmalı**, yoksa üretilen HTML ve
+`js/` çıktısı güncellenmez.
+
+**Cloudflare Pages'te build komutu tanımlanmamalıdır.** Derleme lokalde yapılır,
+çıktı (`js/*.js` ve üretilen HTML) repoya commit edilir; Pages dosyaları olduğu gibi
+sunar. Böylece deploy davranışı TypeScript öncesiyle aynı kalır.
 
 ## SIRADAKİ: Canlıya alma
 
@@ -128,7 +160,20 @@ HTML güncellenmez.
   genel ("AKER OSGB referans müşterisi logosu"). Firma adları bilinirse `js/data.js`
   içindeki `alt` alanları düzeltilebilir.
 
-## Doğrulama kaydı
+## Doğrulama kaydı (TypeScript geçişi)
+
+- `npm run typecheck` → üç projede de hata yok (strict, `noUncheckedIndexedAccess` açık).
+- `npm run build` → 3 bundle derlendi (data 13,5 KB / script 12,7 KB / admin 22,0 KB),
+  22 adresli sitemap üretildi.
+- Tarayıcıda çalıştırılarak doğrulandı (headless Chrome):
+  - Ana sayfa: iki Swiper başlatıldı, 54 referans logosu ve 3 ilan kartı basıldı.
+  - Veri deposu: `getAll`, `getById`, `move`, `reset`, `hasCustomData` beklendiği gibi.
+  - Yönetim paneli: hatalı/doğru şifre, bölüm geçişi, 11 satırlık ekip tablosu,
+    düzenleme modalı, kaydetme ve başvurular bölümü çalışıyor.
+  - İletişim formu: KVKK + reCAPTCHA onayı olmadan buton kapalı, boş formda istek
+    gitmiyor, dolu formda tek istek gidiyor, hata mesajı gösteriliyor.
+
+## Doğrulama kaydı (SEO turu)
 
 - `node tools/seo-check.mjs` → "Sorun bulunamadı" (alt, canonical, lang, h1 sayısı,
   benzersiz title/description, kırık iç bağlantı, JSON-LD geçerliliği).

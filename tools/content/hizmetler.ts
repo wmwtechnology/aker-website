@@ -8,7 +8,37 @@
 // mevzuata karşı doğrulanmalıdır.
 // =========================================================
 
-export const SERVICES = [
+export interface FaqEntry {
+  q: string;
+  a: string;
+}
+
+export interface ServiceSection {
+  h2: string;
+  p?: string[];
+  list?: string[];
+}
+
+export interface Service {
+  /** URL parçası: /hizmetlerimiz/<slug> */
+  slug: string;
+  /** Menü ve kartlarda görünen kısa ad. */
+  nav: string;
+  h1: string;
+  title: string;
+  description: string;
+  /** img/ altındaki ikon dosyasının uzantısız adı. */
+  icon: string;
+  /** Kart altındaki tek cümlelik özet. */
+  short: string;
+  intro: string;
+  sections: ServiceSection[];
+  faq?: FaqEntry[];
+  /** İlgili hizmetlerin slug listesi. */
+  related?: string[];
+}
+
+export const SERVICES: Service[] = [
   // -------------------------------------------------------
   {
     slug: 'is-guvenligi-uzmanligi',
