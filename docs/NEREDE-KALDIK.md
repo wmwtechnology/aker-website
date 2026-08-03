@@ -182,24 +182,27 @@ sunar. Böylece deploy davranışı TypeScript öncesiyle aynı kalır.
 
 ## SIRADAKİ: Canlıya alma
 
-0. **Veri tabanı, depo ve gizli değerler oluşturulur** (yönetim paneli bunlar olmadan çalışmaz):
+0. ~~Veri tabanı, depo ve gizli değerler~~ — **TAMAMLANDI 2026-08-03**:
+   - D1 `aker-website` oluşturuldu (`e4e73ca8-8ac6-4fa3-9511-3686e45ac3ef`), şema + tohum yüklendi
+   - R2 kovası `aker-website-media` oluşturuldu
+   - `ADMIN_PASSWORD` ve `SESSION_SECRET` Pages secret olarak tanımlandı
+   - Site `aker-website` Pages projesine deploy edildi (production branch: `master`)
+   - **Eksik:** `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `MAIL_FROM` — bunlar girilene kadar
+     iletişim formu e-posta göndermez (başvurular yine de veri tabanına kaydedilir).
+
+1. ~~Cloudflare Pages projesi bağlanır~~ — **TAMAMLANDI**. Deploy komutu:
 
    ```
-   wrangler d1 create aker-website          # çıktıdaki database_id wrangler.toml'a yazılır
-   wrangler r2 bucket create aker-website-media
-   npm run db:setup:remote                  # şema + tohum verisi
+   npm run verify
+   npx wrangler pages deploy . --project-name aker-website --branch master
    ```
+   > **Not:** `aker-website.pages.dev` bu ofisin ağından açılmıyor (TLS SNI engeli).
+   > Doğrulama dışarıdan bir vekil sunucu üzerinden yapıldı. Panel ancak alan adı
+   > bağlandıktan sonra buradan kullanılabilir.
 
-   Ardından Pages projesinde üç secret tanımlanır:
-   `ADMIN_PASSWORD` (panel şifresi), `SESSION_SECRET` (uzun rastgele dize),
-   `RESEND_API_KEY` (+ `CONTACT_TO_EMAIL`, `MAIL_FROM`).
-
-   `wrangler.toml` içindeki `database_id` şu an `"yerel-gelistirme"` yazıyor;
-   gerçek kimlikle değiştirilmelidir.
-
-1. **Cloudflare Pages projesi bağlanır** (`wrangler.toml` hazır: `pages_build_output_dir = "."`,
-   build komutu yok).
-2. **`akerosgb.com.tr` DNS'i Bubble'dan Pages'e çevrilir.** Bubble'daki sayfa yapısı ile
+2. **`akerosgb.com.tr` DNS'i Bubble'dan Pages'e çevrilir.** (Wrangler yetkisi zone
+   üzerinde yalnızca okuma olduğu için bu adım panelden elle yapılmalıdır:
+   Cloudflare Dashboard → Pages → aker-website → Custom domains → Set up a domain.) Bubble'daki sayfa yapısı ile
    yeni yapı birebir aynı (`/`, `/belgelerimiz`, `/ekibimiz`, `/isbasvuru` — canlıda
    kontrol edildi, başka sayfa yok), bu yüzden ek 301 gerekmiyor.
 3. **www → apex yönlendirmesi** Cloudflare panelinden Redirect Rule ile kurulmalı.

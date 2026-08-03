@@ -85,14 +85,14 @@ export const DEFAULT_DATA: CmsData = {
     },
     {
       id: 'career-2',
-      title: 'Bizimle Çalışmak İster misiniz ?',
+      title: 'Bizimle Çalışmak İster misiniz?',
       text: 'Engelli bireylerin iş gücüne katılımını destekliyoruz! Ekibimize katılacak, çalışabilecek durumda engelli raporu olan çalışma arkadaşı arıyoruz. Her bireyin potansiyeline değer veriyor ve fırsat eşitliğini önemsiyoruz. Eğer bu kriterlere uygun olduğunuzu...',
       cardImage: '/img/career-2-kart.webp',
       image: '/img/career-2.webp'
     },
     {
       id: 'career-3',
-      title: 'Bizimle Çalışmak İster misiniz ?',
+      title: 'Bizimle Çalışmak İster misiniz?',
       text: 'Kocaeli, Gebze Bölgesi\'nde bulunan bir firmada tercihen bayan, araç kullanabilecek, sahada çalışabilecek HEMŞİRE arayışımız bulunmaktadır.',
       cardImage: '/img/career-3-kart.webp',
       image: '/img/career-3.webp'
@@ -225,7 +225,7 @@ export const DEFAULT_DATA: CmsData = {
     },
     {
       id: 'team-5',
-      name: 'ERTUGRUL IŞIK',
+      name: 'ERTUĞRUL IŞIK',
       role: 'YÖNETİM KURUL BAŞKANI',
       photo: '/img/team-5.webp'
     },

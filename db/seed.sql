@@ -64,8 +64,8 @@ INSERT OR IGNORE INTO clients (id, sira, image, alt) VALUES ('client-54', 53, '/
 
 -- careers (3 kayıt)
 INSERT OR IGNORE INTO careers (id, sira, title, text, cardImage, image) VALUES ('career-1', 0, 'Bizimle Çalışmak İster misiniz?', 'Gebze-Darıca-Çayırova bölgelerinde ikamet eden, Haftada 5 gün çalışacak Gezici C Sınıfı Uzman arayışımız vardır.', '/img/career-1-kart.webp', '/img/career-1.webp');
-INSERT OR IGNORE INTO careers (id, sira, title, text, cardImage, image) VALUES ('career-2', 1, 'Bizimle Çalışmak İster misiniz ?', 'Engelli bireylerin iş gücüne katılımını destekliyoruz! Ekibimize katılacak, çalışabilecek durumda engelli raporu olan çalışma arkadaşı arıyoruz. Her bireyin potansiyeline değer veriyor ve fırsat eşitliğini önemsiyoruz. Eğer bu kriterlere uygun olduğunuzu...', '/img/career-2-kart.webp', '/img/career-2.webp');
-INSERT OR IGNORE INTO careers (id, sira, title, text, cardImage, image) VALUES ('career-3', 2, 'Bizimle Çalışmak İster misiniz ?', 'Kocaeli, Gebze Bölgesi''nde bulunan bir firmada tercihen bayan, araç kullanabilecek, sahada çalışabilecek HEMŞİRE arayışımız bulunmaktadır.', '/img/career-3-kart.webp', '/img/career-3.webp');
+INSERT OR IGNORE INTO careers (id, sira, title, text, cardImage, image) VALUES ('career-2', 1, 'Bizimle Çalışmak İster misiniz?', 'Engelli bireylerin iş gücüne katılımını destekliyoruz! Ekibimize katılacak, çalışabilecek durumda engelli raporu olan çalışma arkadaşı arıyoruz. Her bireyin potansiyeline değer veriyor ve fırsat eşitliğini önemsiyoruz. Eğer bu kriterlere uygun olduğunuzu...', '/img/career-2-kart.webp', '/img/career-2.webp');
+INSERT OR IGNORE INTO careers (id, sira, title, text, cardImage, image) VALUES ('career-3', 2, 'Bizimle Çalışmak İster misiniz?', 'Kocaeli, Gebze Bölgesi''nde bulunan bir firmada tercihen bayan, araç kullanabilecek, sahada çalışabilecek HEMŞİRE arayışımız bulunmaktadır.', '/img/career-3-kart.webp', '/img/career-3.webp');
 
 -- documents (13 kayıt)
 INSERT OR IGNORE INTO documents (id, sira, title, image) VALUES ('doc-1', 0, 'Kalite Yönetim Sistemi', '/img/doc-1.webp');
@@ -93,7 +93,7 @@ INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-1', 0, 'E
 INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-2', 1, 'EMRE GÜLTEKİN', 'FİNANS UZMANI', '/img/team-2.webp');
 INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-3', 2, 'Süleyman Atalay', 'Satın Alma ve İdari İşler Müdürü', '/img/team-3.webp');
 INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-4', 3, 'TAMER ÇEKECEKER', 'GENEL MÜDÜR', '/img/team-4.webp');
-INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-5', 4, 'ERTUGRUL IŞIK', 'YÖNETİM KURUL BAŞKANI', '/img/team-5.webp');
+INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-5', 4, 'ERTUĞRUL IŞIK', 'YÖNETİM KURUL BAŞKANI', '/img/team-5.webp');
 INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-6', 5, 'ESRA KURT', 'SÜREÇ YÖNETİM UZMANI', '/img/team-6.webp');
 INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-7', 6, 'DİLAN ŞEN', 'YÖNETİCİ ASİSTAN', '/img/team-7.webp');
 INSERT OR IGNORE INTO team (id, sira, name, role, photo) VALUES ('team-8', 7, 'NURCAN ÖKTEM', 'İNSAN KAYNAKLAR SORUMLUSU', '/img/team-8.webp');

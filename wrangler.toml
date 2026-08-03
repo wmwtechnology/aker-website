@@ -7,7 +7,7 @@ compatibility_date = "2026-06-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "aker-website"
-database_id = "yerel-gelistirme"
+database_id = "e4e73ca8-8ac6-4fa3-9511-3686e45ac3ef"
 
 # Panelden yüklenen görseller. /img/uploads/<anahtar> adresinden servis edilir.
 [[r2_buckets]]
