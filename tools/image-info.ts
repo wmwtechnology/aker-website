@@ -48,4 +48,20 @@ for (const file of readdirSync(IMG_DIR)) {
 }
 
 writeFileSync(path.join(ROOT, 'tools', 'image-sizes.json'), JSON.stringify(sizes, null, 2) + '\n', 'utf8');
-console.log(`${Object.keys(sizes).length} görselin boyutu yazıldı`);
+
+// Aynı bilgi TypeScript modülü olarak da yazılır: hem derleme betiği hem de
+// Cloudflare Functions bu modülü içe aktarıp width/height niteliklerini üretir.
+const module = `// Bu dosya \`node tools/image-info.ts\` ile üretilir. Elle düzenlemeyin.
+// img/ altındaki görsellerin gerçek boyutları; CLS'i önlemek için
+// width/height niteliklerinde kullanılır.
+
+export interface ImageSize {
+  width: number;
+  height: number;
+}
+
+export const IMAGE_SIZES: Record<string, ImageSize | undefined> = ${JSON.stringify(sizes, null, 2)};
+`;
+
+writeFileSync(path.join(ROOT, 'src', 'image-sizes.gen.ts'), module, 'utf8');
+console.log(`${Object.keys(sizes).length} görselin boyutu yazıldı (json + ts)`);

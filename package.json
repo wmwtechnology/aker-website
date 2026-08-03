@@ -11,7 +11,12 @@
     "typecheck": "tsc --noEmit",
     "check": "node tools/seo-check.ts",
     "verify": "npm run typecheck && npm run build && npm run check",
-    "dev": "node tools/serve.ts"
+    "dev": "node tools/serve.ts",
+    "db:seed": "node tools/seed.ts > db/seed.sql",
+    "db:setup": "wrangler d1 execute aker-website --local --file=db/schema.sql && wrangler d1 execute aker-website --local --file=db/seed.sql",
+    "db:setup:remote": "wrangler d1 execute aker-website --remote --file=db/schema.sql && wrangler d1 execute aker-website --remote --file=db/seed.sql",
+    "dev:full": "wrangler pages dev . --port 8788",
+    "e2e": "node tools/e2e.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250801.0",

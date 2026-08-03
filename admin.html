@@ -7,22 +7,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:regular%7CInter:500%7CInter:700%7COpen+Sans:regular%7COpen+Sans:600%7COpen+Sans:700">
-<link rel="icon" type="image/png" href="img/favicon-kaynak.webp">
+<link rel="icon" type="image/png" href="/img/favicon-kaynak.webp">
 
-<link type="text/css" href="css/style.css" rel="stylesheet">
-<link type="text/css" href="css/admin.css" rel="stylesheet">
+<link type="text/css" href="/css/style.css" rel="stylesheet">
+<link type="text/css" href="/css/admin.css" rel="stylesheet">
 </head>
 <body class="admin-body" style="height: 100%; display: flex; flex-direction: column;">
 
 <!-- Giriş Ekranı -->
 <div class="admin-login" id="login-screen">
   <div class="admin-login-box">
-    <div class="admin-login-logo"><img src="img/aker-osgb-logo-footer.webp" alt="AKER OSGB"></div>
+    <div class="admin-login-logo"><img src="/img/aker-osgb-logo-footer.webp" alt="AKER OSGB"></div>
     <div class="admin-login-title">Yönetim Paneli Girişi</div>
-    <div class="admin-field">
-      <label for="login-username">Kullanıcı Adı</label>
-      <input type="text" id="login-username" autocomplete="username">
-    </div>
     <div class="admin-field">
       <label for="login-password">Şifre</label>
       <input type="password" id="login-password" autocomplete="current-password">
@@ -36,7 +32,7 @@
 <div class="admin-dashboard" id="admin-dashboard" style="display: none;">
 
   <div class="admin-sidebar">
-    <div class="admin-sidebar-logo"><img src="img/aker-osgb-logo-footer.webp" alt="AKER OSGB"></div>
+    <div class="admin-sidebar-logo"><img src="/img/aker-osgb-logo-footer.webp" alt="AKER OSGB"></div>
     <div class="admin-nav">
       <button class="admin-nav-btn active" data-section="slides">Ana Sayfa Slider</button>
       <button class="admin-nav-btn" data-section="clients">Referanslar</button>
@@ -82,11 +78,6 @@
     </div>
   </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.3.6/dist/docx-preview.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="js/data.js"></script>
-<script src="js/admin.js"></script>
+<script src="/js/admin.js" defer></script>
 </body>
 </html>

@@ -16,6 +16,8 @@ export interface Client {
 export interface Slide {
   id: string;
   image: string;
+  /** Görselin alt metni; boşsa genel bir metin kullanılır. */
+  alt?: string;
 }
 
 export interface Career {

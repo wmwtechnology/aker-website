@@ -14,7 +14,6 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const ENTRIES = [
-  { in: 'src/data.ts', out: 'data' },
   { in: 'src/script.ts', out: 'script' },
   { in: 'src/admin.ts', out: 'admin' },
 ];

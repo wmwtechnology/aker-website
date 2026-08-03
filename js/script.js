@@ -11,12 +11,6 @@
   function byId(id) {
     return document.getElementById(id);
   }
-  function escapeHtml(value) {
-    return String(value != null ? value : "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-  function escapeAttr(value) {
-    return escapeHtml(value).replace(/"/g, "&quot;");
-  }
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
@@ -31,85 +25,12 @@
 
   // src/script.ts
   document.addEventListener("DOMContentLoaded", () => {
-    renderHeroSlides();
-    renderClientLogos();
-    renderCareers();
-    renderNews();
-    renderDocuments();
-    renderTeam();
-    initJobDetail();
     initHeroSwiper();
     initClientsSwiper();
     initCarousels();
     initContactForm();
     initNewsletterForm();
   });
-  function shouldRerender() {
-    var _a, _b;
-    return Boolean((_b = (_a = window.AkerStore) == null ? void 0 : _a.hasCustomData) == null ? void 0 : _b.call(_a));
-  }
-  function renderHeroSlides() {
-    const wrapper = qs(".hero-slides-wrapper");
-    if (!wrapper || !shouldRerender()) return;
-    wrapper.innerHTML = window.AkerStore.getAll("slides").map(
-      (slide) => `<div class="swiper-slide"><img loading="lazy" decoding="async" src="${escapeAttr(slide.image)}" alt="AKER OSGB tanıtım görseli" class="slide-img"></div>`
-    ).join("");
-  }
-  function renderClientLogos() {
-    const wrapper = qs(".clients-slides-wrapper");
-    if (!wrapper || !shouldRerender()) return;
-    wrapper.innerHTML = window.AkerStore.getAll("clients").map(
-      (client) => `<div class="swiper-slide"><img loading="lazy" decoding="async" src="${escapeAttr(client.image)}" alt="${escapeAttr(client.alt || "AKER OSGB referansı")}" class="client-logo"></div>`
-    ).join("");
-  }
-  function renderCareers() {
-    const grid = qs(".careers-grid");
-    if (!grid || !shouldRerender()) return;
-    grid.innerHTML = window.AkerStore.getAll("careers").map(
-      (career) => `<div class="career-card"><div class="career-card-shadow"><div class="career-card-image" style="background-image: url(&quot;${escapeAttr(career.cardImage)}&quot;);" role="img" aria-label="${escapeAttr(career.title)}"></div><div class="career-card-body"><h3 class="career-card-title">${escapeHtml(career.title)}</h3><p class="career-card-text">${escapeHtml(career.text)}</p><a class="career-btn" href="/isbasvuru?id=${encodeURIComponent(career.id)}">Detayları Gör</a></div></div></div>`
-    ).join("");
-  }
-  function renderNews() {
-    const grid = qs(".news-grid");
-    if (!grid || !shouldRerender()) return;
-    grid.innerHTML = window.AkerStore.getAll("news").map((item) => {
-      var _a;
-      const link = (_a = item.link) == null ? void 0 : _a.trim();
-      const open = link ? `<a class="news-card" href="${escapeAttr(link)}" target="_blank" rel="noopener">` : '<div class="news-card">';
-      const close = link ? "</a>" : "</div>";
-      return open + `<div class="news-card-shadow"><div class="news-card-image" style="background-image: url(&quot;${escapeAttr(item.image)}&quot;);" role="img" aria-label="${escapeAttr(item.title)}"></div><div class="news-card-body"><h3 class="news-card-title">${escapeHtml(item.title)}</h3><p class="news-card-text">${escapeHtml(item.text)}</p></div></div>` + close;
-    }).join("");
-  }
-  function renderDocuments() {
-    const grid = qs(".documents-grid");
-    if (!grid || !shouldRerender()) return;
-    grid.innerHTML = window.AkerStore.getAll("documents").map(
-      (doc) => `<div class="document-card"><h2 class="document-title">${escapeHtml(doc.title)}</h2><div class="document-image"><img loading="lazy" decoding="async" src="${escapeAttr(doc.image)}" alt="${escapeAttr(doc.title)} belgesi" class="document-img"></div></div>`
-    ).join("");
-  }
-  function renderTeam() {
-    const grid = qs(".team-grid");
-    if (!grid || !shouldRerender()) return;
-    grid.innerHTML = window.AkerStore.getAll("team").map(
-      (member) => `<div class="team-card"><div class="team-photo" style="background-image: url(&quot;${escapeAttr(member.photo)}&quot;);" role="img" aria-label="${escapeAttr(member.name)}"></div><h2 class="team-name">${escapeHtml(member.name)}</h2><div class="team-role">${escapeHtml(member.role)}</div></div>`
-    ).join("");
-  }
-  function initJobDetail() {
-    var _a;
-    const section = qs(".job-section");
-    if (!section || !window.AkerStore) return;
-    const id = new URLSearchParams(window.location.search).get("id");
-    const career = (_a = window.AkerStore.getById("careers", id)) != null ? _a : window.AkerStore.getAll("careers")[0];
-    if (!career) return;
-    const image = qs(".job-image img", section);
-    const title = qs(".job-title", section);
-    const text = qs(".job-text", section);
-    if (image) image.src = career.image;
-    if (title) title.textContent = career.title;
-    if (text) text.textContent = career.text;
-    const form = qs(".application-form", section);
-    if (form) form.dataset["careerId"] = career.id;
-  }
   function initHeroSwiper() {
     const el = qs(".hero-swiper .swiper");
     if (!el || !window.Swiper) return;
@@ -157,6 +78,7 @@
   function initContactForm() {
     const form = qs(".contact-form-block");
     if (!form) return;
+    const basvuruFormu = form.classList.contains("application-form");
     const submitBtn = qs(".submit-btn", form);
     const kvkkCheckbox = qs("#kvkk-check", form);
     const recaptchaCheckbox = qs(".recaptcha-checkbox", form);
@@ -187,14 +109,17 @@
     initKvkkModal();
     if (!submitBtn) return;
     submitBtn.addEventListener("click", (event) => {
-      var _a, _b, _c, _d;
+      var _a, _b, _c;
       event.preventDefault();
       if (submitBtn.disabled) return;
       const inputs = qsa(".field-input", form);
       const [nameInput, phoneInput, emailInput] = inputs;
       const messageInput = qs(".field-textarea", form);
       if (!nameInput || !phoneInput || !emailInput || !messageInput) return;
-      if (!nameInput.value || !phoneInput.value || !emailInput.value || !messageInput.value) return;
+      if (!nameInput.value || !phoneInput.value || !emailInput.value || !messageInput.value) {
+        showAlert(alertBox, "Lütfen zorunlu alanları doldurun.");
+        return;
+      }
       const resetForm = (message) => {
         showAlert(alertBox, message);
         for (const input of inputs) input.value = "";
@@ -205,45 +130,25 @@
         if (recaptchaCheckbox) recaptchaCheckbox.checked = false;
         submitBtn.disabled = true;
       };
-      if (form.classList.contains("application-form")) {
-        const careerId = (_a = form.dataset["careerId"]) != null ? _a : "";
-        const career = window.AkerStore.getById("careers", careerId);
-        const cvFile = (_c = (_b = fileInput == null ? void 0 : fileInput.files) == null ? void 0 : _b[0]) != null ? _c : null;
-        if (cvFile && !isPdf(cvFile)) {
-          showAlert(alertBox, "Lütfen özgeçmişinizi yalnızca PDF formatında yükleyin.");
-          return;
-        }
-        const store = (cvFileData, cvFileType) => {
-          var _a2, _b2;
-          window.AkerApplications.add({
-            careerId,
-            careerTitle: (_a2 = career == null ? void 0 : career.title) != null ? _a2 : "",
-            name: nameInput.value,
-            phone: phoneInput.value,
-            email: emailInput.value,
-            message: messageInput.value,
-            cvFileName: (_b2 = cvFile == null ? void 0 : cvFile.name) != null ? _b2 : "",
-            cvFileType,
-            cvFileData
-          });
-          resetForm("Başvurunuz alındı.");
-        };
-        if (cvFile) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            var _a2;
-            return store(String((_a2 = reader.result) != null ? _a2 : ""), cvFile.type);
-          };
-          reader.onerror = () => store("", "");
-          reader.readAsDataURL(cvFile);
-        } else {
-          store("", "");
-        }
+      const honeypot = qs(".hp-field", form);
+      const cvFile = (_b = (_a = fileInput == null ? void 0 : fileInput.files) == null ? void 0 : _a[0]) != null ? _b : null;
+      if (basvuruFormu && cvFile && !isPdf(cvFile)) {
+        showAlert(alertBox, "Lütfen özgeçmişinizi yalnızca PDF formatında yükleyin.");
         return;
       }
-      const honeypot = qs(".hp-field", form);
       submitBtn.disabled = true;
-      fetch("/api/contact", {
+      const istek = basvuruFormu ? (() => {
+        var _a2, _b2;
+        const gonderi = new FormData();
+        gonderi.append("name", nameInput.value);
+        gonderi.append("phone", phoneInput.value);
+        gonderi.append("email", emailInput.value);
+        gonderi.append("message", messageInput.value);
+        gonderi.append("careerId", (_a2 = form.dataset["careerId"]) != null ? _a2 : ilanKimligi());
+        gonderi.append("company_website", (_b2 = honeypot == null ? void 0 : honeypot.value) != null ? _b2 : "");
+        if (cvFile) gonderi.append("cv", cvFile);
+        return fetch("/api/basvuru", { method: "POST", body: gonderi });
+      })() : fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -251,15 +156,16 @@
           phone: phoneInput.value,
           email: emailInput.value,
           message: messageInput.value,
-          company_website: (_d = honeypot == null ? void 0 : honeypot.value) != null ? _d : ""
+          company_website: (_c = honeypot == null ? void 0 : honeypot.value) != null ? _c : ""
         })
-      }).then(async (res) => {
-        const data = await res.json();
+      });
+      istek.then(async (res) => {
+        const data = await res.json().catch(() => ({}));
         return { ok: res.ok, data };
       }).then((result) => {
         var _a2;
         if (result.ok && result.data.ok) {
-          resetForm("Mesajınız başarıyla gönderildi.");
+          resetForm(basvuruFormu ? "Başvurunuz alındı." : "Mesajınız başarıyla gönderildi.");
         } else {
           showAlert(alertBox, (_a2 = result.data.error) != null ? _a2 : "Bir hata oluştu, lütfen tekrar deneyin.");
           submitBtn.disabled = false;
@@ -269,6 +175,10 @@
         submitBtn.disabled = false;
       });
     });
+  }
+  function ilanKimligi() {
+    var _a;
+    return (_a = new URLSearchParams(window.location.search).get("id")) != null ? _a : "";
   }
   function initKvkkModal() {
     const link = byId("kvkk-link");

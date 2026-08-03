@@ -1,17 +1,16 @@
 // =========================================================
 // AKER OSGB - Yönetim Paneli
 // =========================================================
-// UYARI: Giriş denetimi tamamen istemci tarafındadır ve gerçek
-// bir güvenlik katmanı değildir. Panel canlıya alınmadan önce
-// kimlik doğrulama sunucu tarafına taşınmalıdır.
+// İçerik sunucudaki D1 veri tabanında tutulur. Buradan yapılan
+// her değişiklik siteye anında yansır.
+//
+// Kimlik doğrulama sunucu tarafındadır: şifre Pages secret'ında
+// saklanır, giriş başarılı olduğunda HttpOnly oturum çerezi verilir.
+// Bu dosyada şifre veya token bulunmaz.
 // =========================================================
 
+import { api, ApiError } from './api.ts';
 import { byId, escapeAttr, escapeHtml, qs, qsa } from './dom.ts';
-import type { Application, CmsItem, CollectionName } from './types.ts';
-
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'aker2024';
-const SESSION_KEY = 'aker_admin_session';
 
 type FieldType = 'text' | 'textarea' | 'image';
 
@@ -34,19 +33,42 @@ interface CollectionConfig {
   columns: ColumnConfig[];
 }
 
-const COLLECTIONS: Record<CollectionName, CollectionConfig> = {
+interface Kayit {
+  id: string;
+  [alan: string]: string;
+}
+
+interface Basvuru {
+  id: string;
+  olusturuldu: string;
+  careerTitle: string;
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+  cvFileName: string;
+  cvKey: string;
+}
+
+const COLLECTIONS: Record<string, CollectionConfig> = {
+  slides: {
+    label: 'Ana Sayfa Slider',
+    fields: [
+      { key: 'image', label: 'Görsel', type: 'image' },
+      { key: 'alt', label: 'Görsel açıklaması (alt metni)', type: 'text' },
+    ],
+    columns: [{ key: 'image', label: '', type: 'image' }],
+  },
   clients: {
     label: 'Referanslar',
     fields: [
       { key: 'image', label: 'Logo', type: 'image' },
       { key: 'alt', label: 'Firma adı (görsel alt metni)', type: 'text' },
     ],
-    columns: [{ key: 'image', label: '', type: 'image' }],
-  },
-  slides: {
-    label: 'Ana Sayfa Slider',
-    fields: [{ key: 'image', label: 'Görsel', type: 'image' }],
-    columns: [{ key: 'image', label: '', type: 'image' }],
+    columns: [
+      { key: 'image', label: '', type: 'image' },
+      { key: 'alt', label: 'Firma' },
+    ],
   },
   careers: {
     label: 'Kariyer İlanları',
@@ -107,34 +129,39 @@ const ORDER_UP_SVG =
 const ORDER_DOWN_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 
-const state: { section: CollectionName | 'applications'; editingId: string | null } = {
+const state: {
+  section: string;
+  editingId: string | null;
+  kayitlar: Kayit[];
+  basvurular: Basvuru[];
+} = {
   section: 'slides',
   editingId: null,
+  kayitlar: [],
+  basvurular: [],
 };
 
-function isCollection(value: string): value is CollectionName {
-  return value in COLLECTIONS;
-}
-
-/** Koleksiyon elemanının alanına tip güvenli erişim. */
-function fieldValue(item: CmsItem | Record<string, unknown> | null, key: string): string {
-  if (!item) return '';
-  const value = (item as Record<string, unknown>)[key];
-  return typeof value === 'string' ? value : '';
-}
-
 document.addEventListener('DOMContentLoaded', () => {
+  void baslat();
+});
+
+async function baslat(): Promise<void> {
   initLogin();
   initNav();
   initModal();
   initAppDetailModal();
-  initReset();
 
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
-    showDashboard();
-    renderSection();
+  // Oturum hâlâ geçerliyse doğrudan panele gir.
+  try {
+    const { oturum } = await api.oturumVarMi();
+    if (oturum) {
+      showDashboard();
+      await renderSection();
+    }
+  } catch {
+    // Oturum sorgusu başarısızsa giriş ekranı gösterilmeye devam eder.
   }
-});
+}
 
 // ---------------------------------------------------------
 // Giriş / Çıkış
@@ -144,30 +171,32 @@ function initLogin(): void {
   const userInput = byId<HTMLInputElement>('login-username');
   const passInput = byId<HTMLInputElement>('login-password');
   const errorBox = byId('login-error');
-  const logoutBtn = byId<HTMLButtonElement>('logout-btn');
-  if (!loginBtn || !userInput || !passInput || !errorBox) return;
+  if (!loginBtn || !passInput || !errorBox) return;
 
-  function attempt(): void {
-    if (userInput!.value === ADMIN_USER && passInput!.value === ADMIN_PASS) {
-      sessionStorage.setItem(SESSION_KEY, '1');
-      errorBox!.textContent = '';
+  const dene = async (): Promise<void> => {
+    errorBox.textContent = '';
+    loginBtn.disabled = true;
+    try {
+      await api.girisYap(passInput.value);
+      passInput.value = '';
       showDashboard();
-      renderSection();
-    } else {
-      errorBox!.textContent = 'Kullanıcı adı veya şifre hatalı.';
+      await renderSection();
+    } catch (err) {
+      errorBox.textContent = err instanceof ApiError ? err.message : 'Giriş yapılamadı.';
+    } finally {
+      loginBtn.disabled = false;
     }
-  }
+  };
 
-  loginBtn.addEventListener('click', attempt);
+  loginBtn.addEventListener('click', () => void dene());
   for (const input of [userInput, passInput]) {
-    input.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') attempt();
+    input?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') void dene();
     });
   }
 
-  logoutBtn?.addEventListener('click', () => {
-    sessionStorage.removeItem(SESSION_KEY);
-    location.reload();
+  byId('logout-btn')?.addEventListener('click', () => {
+    void api.cikisYap().finally(() => location.reload());
   });
 }
 
@@ -176,6 +205,26 @@ function showDashboard(): void {
   const dashboard = byId('admin-dashboard');
   if (login) login.style.display = 'none';
   if (dashboard) dashboard.style.display = 'flex';
+}
+
+function showLogin(mesaj: string): void {
+  const login = byId('login-screen');
+  const dashboard = byId('admin-dashboard');
+  const errorBox = byId('login-error');
+  if (login) login.style.display = 'flex';
+  if (dashboard) dashboard.style.display = 'none';
+  if (errorBox) errorBox.textContent = mesaj;
+}
+
+/** Oturum düşmüşse giriş ekranına döner, diğer hataları gösterir. */
+function hatayiIsle(err: unknown): void {
+  if (err instanceof ApiError && err.status === 401) {
+    showLogin('Oturumunuz sona erdi, tekrar giriş yapın.');
+    return;
+  }
+  const content = byId('admin-content');
+  const mesaj = err instanceof Error ? err.message : 'Beklenmeyen bir hata oluştu.';
+  if (content) content.innerHTML = `<div class="admin-empty">${escapeHtml(mesaj)}</div>`;
 }
 
 // ---------------------------------------------------------
@@ -187,10 +236,8 @@ function initNav(): void {
     btn.addEventListener('click', () => {
       for (const other of buttons) other.classList.remove('active');
       btn.classList.add('active');
-
-      const section = btn.dataset['section'] ?? '';
-      state.section = section === 'applications' || isCollection(section) ? section : 'slides';
-      renderSection();
+      state.section = btn.dataset['section'] ?? 'slides';
+      void renderSection();
     });
   }
 }
@@ -198,29 +245,40 @@ function initNav(): void {
 // ---------------------------------------------------------
 // Bölüm içeriği
 // ---------------------------------------------------------
-function renderSection(): void {
-  if (sessionStorage.getItem(SESSION_KEY) !== '1') return;
-
+async function renderSection(): Promise<void> {
   const titleEl = byId('admin-section-title');
   const addBtn = byId('add-btn');
   const content = byId('admin-content');
   if (!titleEl || !addBtn || !content) return;
 
-  if (state.section === 'applications') {
-    titleEl.textContent = 'Başvurular';
-    addBtn.style.display = 'none';
-    renderApplications(content);
-    return;
-  }
+  content.innerHTML = '<div class="admin-empty">Yükleniyor…</div>';
 
-  const config = COLLECTIONS[state.section];
-  titleEl.textContent = config.label;
-  addBtn.style.display = 'inline-flex';
-  renderTable(content, config, state.section);
+  try {
+    if (state.section === 'applications') {
+      titleEl.textContent = 'Başvurular';
+      addBtn.style.display = 'none';
+      const { kayitlar } = await api.listele<Basvuru>('applications');
+      state.basvurular = kayitlar;
+      renderApplications(content);
+      return;
+    }
+
+    const config = COLLECTIONS[state.section];
+    if (!config) return;
+
+    titleEl.textContent = config.label;
+    addBtn.style.display = 'inline-flex';
+
+    const { kayitlar } = await api.listele<Kayit>(state.section);
+    state.kayitlar = kayitlar;
+    renderTable(content, config);
+  } catch (err) {
+    hatayiIsle(err);
+  }
 }
 
-function renderTable(content: HTMLElement, config: CollectionConfig, section: CollectionName): void {
-  const items = window.AkerStore.getAll(section) as CmsItem[];
+function renderTable(content: HTMLElement, config: CollectionConfig): void {
+  const items = state.kayitlar;
   const countHtml = `<div class="admin-record-count">Toplam Kayıt Sayısı : ${items.length}</div>`;
 
   if (items.length === 0) {
@@ -239,7 +297,7 @@ function renderTable(content: HTMLElement, config: CollectionConfig, section: Co
 
       const cells = config.columns
         .map((col) => {
-          const value = fieldValue(item, col.key);
+          const value = item[col.key] ?? '';
           if (col.type === 'image') return `<td><img class="admin-thumb" src="${escapeAttr(value)}" alt=""></td>`;
           if (col.truncate && value.length > 80) return `<td>${escapeHtml(value.slice(0, 80))}…</td>`;
           return `<td>${escapeHtml(value)}</td>`;
@@ -260,21 +318,36 @@ function renderTable(content: HTMLElement, config: CollectionConfig, section: Co
     `${countHtml}<table class="admin-table"><thead><tr><th class="admin-order-col"></th>${head}<th></th></tr></thead>` +
     `<tbody>${rows}</tbody></table>`;
 
-  bindRowAction(content, 'move-up', (id) => {
-    window.AkerStore.move(section, id, -1);
-    renderSection();
-  });
-  bindRowAction(content, 'move-down', (id) => {
-    window.AkerStore.move(section, id, 1);
-    renderSection();
-  });
+  bindRowAction(content, 'move-up', (id) => void tasi(id, -1));
+  bindRowAction(content, 'move-down', (id) => void tasi(id, 1));
   bindRowAction(content, 'edit', (id) => openModal(id));
-  bindRowAction(content, 'delete', (id) => {
-    if (confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
-      window.AkerStore.remove(section, id);
-      renderSection();
-    }
-  });
+  bindRowAction(content, 'delete', (id) => void silKayit(id));
+}
+
+async function tasi(id: string, yon: number): Promise<void> {
+  const ids = state.kayitlar.map((k) => k.id);
+  const index = ids.indexOf(id);
+  const hedef = index + yon;
+  if (index === -1 || hedef < 0 || hedef >= ids.length) return;
+
+  [ids[index], ids[hedef]] = [ids[hedef]!, ids[index]!];
+
+  try {
+    await api.sirala(state.section, ids);
+    await renderSection();
+  } catch (err) {
+    hatayiIsle(err);
+  }
+}
+
+async function silKayit(id: string): Promise<void> {
+  if (!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
+  try {
+    await api.sil(state.section, id);
+    await renderSection();
+  } catch (err) {
+    hatayiIsle(err);
+  }
 }
 
 function bindRowAction(root: HTMLElement, action: string, handler: (id: string) => void): void {
@@ -290,7 +363,7 @@ function bindRowAction(root: HTMLElement, action: string, handler: (id: string) 
 // Başvurular
 // ---------------------------------------------------------
 function renderApplications(content: HTMLElement): void {
-  const apps = window.AkerApplications.getAll();
+  const apps = state.basvurular;
   const countHtml = `<div class="admin-record-count">Toplam Kayıt Sayısı : ${apps.length}</div>`;
 
   if (apps.length === 0) {
@@ -300,13 +373,13 @@ function renderApplications(content: HTMLElement): void {
 
   const rows = apps
     .map((app) => {
-      const cvCell = app.cvFileData
-        ? `<a href="javascript:void(0)" class="admin-cv-link" data-action="open-cv" data-id="${escapeAttr(app.id)}">${escapeHtml(app.cvFileName || 'Özgeçmiş')}</a>`
+      const cvCell = app.cvKey
+        ? `<a class="admin-cv-link" href="/api/admin/cv/${escapeAttr(app.cvKey)}" target="_blank" rel="noopener">${escapeHtml(app.cvFileName || 'Özgeçmiş')}</a>`
         : escapeHtml(app.cvFileName || '-');
 
       return (
         '<tr>' +
-        `<td>${formatDate(app.date)}</td>` +
+        `<td>${formatDate(app.olusturuldu)}</td>` +
         `<td>${escapeHtml(app.name)}</td>` +
         `<td>${escapeHtml(app.phone)}</td>` +
         `<td>${escapeHtml(app.email)}</td>` +
@@ -325,49 +398,18 @@ function renderApplications(content: HTMLElement): void {
     '<th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>E-Posta</th><th>İlan</th><th>Özgeçmiş</th><th></th>' +
     `</tr></thead><tbody>${rows}</tbody></table>`;
 
-  const find = (id: string): Application | undefined => apps.find((a) => a.id === id);
-
   bindRowAction(content, 'view', (id) => {
-    const app = find(id);
+    const app = apps.find((a) => a.id === id);
     if (app) showApplicationDetail(app);
   });
-  bindRowAction(content, 'open-cv', (id) => {
-    const app = find(id);
-    if (app) openCvInNewTab(app);
-  });
+
   bindRowAction(content, 'delete-app', (id) => {
-    if (confirm('Bu başvuruyu silmek istediğinize emin misiniz?')) {
-      window.AkerApplications.remove(id);
-      renderSection();
-    }
+    if (!confirm('Bu başvuruyu silmek istediğinize emin misiniz?')) return;
+    api
+      .sil('applications', id)
+      .then(() => renderSection())
+      .catch(hatayiIsle);
   });
-}
-
-/** data: URL'yi Blob'a çevirir. */
-function dataUrlToBlob(dataUrl: string, fallbackType?: string): Blob {
-  const parts = dataUrl.split(',');
-  const meta = parts[0]?.match(/data:(.*);base64/);
-  const mime = meta?.[1] || fallbackType || 'application/octet-stream';
-  const binary = atob(parts[1] ?? '');
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-  return new Blob([bytes], { type: mime });
-}
-
-// Büyük PDF'lerde data: URL'lerin yeni sekmede açılması bazı tarayıcılarda
-// engellendiği için blob URL'ye çevrilir.
-function openCvInNewTab(app: Application): void {
-  if (!app.cvFileData) return;
-  try {
-    const url = URL.createObjectURL(dataUrlToBlob(app.cvFileData, app.cvFileType));
-    window.open(url, '_blank');
-  } catch {
-    window.open(app.cvFileData, '_blank');
-  }
-}
-
-function getFileExtension(fileName: string): string {
-  return /\.([a-z0-9]+)$/i.exec(fileName)?.[1]?.toLowerCase() ?? '';
 }
 
 function initAppDetailModal(): void {
@@ -377,113 +419,29 @@ function initAppDetailModal(): void {
   });
 }
 
-function showApplicationDetail(app: Application): void {
+function showApplicationDetail(app: Basvuru): void {
   const body = byId('app-detail-body');
   const modal = byId('app-detail-modal');
   if (!body || !modal) return;
 
+  const cvSatiri = app.cvKey
+    ? `<div class="admin-detail-row admin-cv-preview-row">
+         <strong>Özgeçmiş:</strong>
+         <a class="admin-icon-btn" href="/api/admin/cv/${escapeAttr(app.cvKey)}" target="_blank" rel="noopener">Yeni Sekmede Aç</a>
+         <iframe src="/api/admin/cv/${escapeAttr(app.cvKey)}" class="admin-cv-preview-frame" title="Özgeçmiş önizleme"></iframe>
+       </div>`
+    : '<div class="admin-detail-row"><strong>Özgeçmiş:</strong> yüklenmemiş</div>';
+
   body.innerHTML =
-    `<div class="admin-detail-row"><strong>Tarih:</strong> ${formatDate(app.date)}</div>` +
+    `<div class="admin-detail-row"><strong>Tarih:</strong> ${formatDate(app.olusturuldu)}</div>` +
     `<div class="admin-detail-row"><strong>Ad Soyad:</strong> ${escapeHtml(app.name)}</div>` +
     `<div class="admin-detail-row"><strong>Telefon:</strong> ${escapeHtml(app.phone)}</div>` +
     `<div class="admin-detail-row"><strong>E-Posta:</strong> ${escapeHtml(app.email)}</div>` +
     `<div class="admin-detail-row"><strong>İlan:</strong> ${escapeHtml(app.careerTitle || '-')}</div>` +
-    `<div class="admin-detail-row"><strong>Özgeçmiş:</strong> ${escapeHtml(app.cvFileName || '-')}</div>` +
     `<div class="admin-detail-row"><strong>Mesaj:</strong><br>${escapeHtml(app.message)}</div>` +
-    renderCvPreview(app);
+    cvSatiri;
 
   modal.style.display = 'flex';
-
-  for (const el of qsa('[data-action="open-cv"]', body)) {
-    el.addEventListener('click', () => openCvInNewTab(app));
-  }
-
-  renderCvPreviewAsync(app);
-}
-
-function renderCvPreview(app: Application): string {
-  if (!app.cvFileData) return '';
-  return (
-    '<div class="admin-detail-row admin-cv-preview-row">' +
-    '<strong>Özgeçmiş Önizleme:</strong>' +
-    '<button class="admin-icon-btn" data-action="open-cv">Yeni Sekmede Aç</button>' +
-    '<div id="admin-cv-preview-target" class="admin-cv-preview-loading">Önizleme yükleniyor...</div>' +
-    '</div>'
-  );
-}
-
-const PREVIEW_FAILED =
-  '<div class="admin-cv-preview-empty">Bu dosya önizlenemedi. Görüntülemek için yeni sekmede açın.</div>';
-
-// Özgeçmiş önizlemesini dosya türüne göre doldurur. Resim ve PDF tarayıcıda
-// doğrudan, DOCX docx-preview ile, XLSX/XLS/CSV SheetJS ile gösterilir.
-function renderCvPreviewAsync(app: Application): void {
-  const target = byId('admin-cv-preview-target');
-  if (!target || !app.cvFileData) return;
-
-  const type = app.cvFileType;
-  const ext = getFileExtension(app.cvFileName);
-  target.classList.remove('admin-cv-preview-loading');
-
-  if (type.startsWith('image/')) {
-    target.innerHTML = `<img src="${escapeAttr(app.cvFileData)}" class="admin-cv-preview-img" data-action="open-cv" alt="Özgeçmiş önizleme (yeni sekmede açmak için tıklayın)">`;
-    qs('[data-action="open-cv"]', target)?.addEventListener('click', () => openCvInNewTab(app));
-    return;
-  }
-
-  if (type === 'application/pdf' || ext === 'pdf') {
-    target.innerHTML = `<iframe src="${escapeAttr(app.cvFileData)}" class="admin-cv-preview-frame" title="Özgeçmiş önizleme"></iframe>`;
-    return;
-  }
-
-  if (ext === 'docx' && window.docx) {
-    const container = document.createElement('div');
-    container.className = 'admin-cv-preview-docx';
-    target.innerHTML = '';
-    target.appendChild(container);
-    window.docx
-      .renderAsync(dataUrlToBlob(app.cvFileData, app.cvFileType), container)
-      .catch(() => {
-        target.innerHTML = PREVIEW_FAILED;
-      });
-    return;
-  }
-
-  if ((ext === 'xlsx' || ext === 'xls' || ext === 'csv') && window.XLSX) {
-    const xlsx = window.XLSX;
-    try {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const workbook = xlsx.read(new Uint8Array(reader.result as ArrayBuffer), { type: 'array' });
-        const firstName = workbook.SheetNames[0];
-        const sheet = firstName ? workbook.Sheets[firstName] : undefined;
-        target.innerHTML = sheet
-          ? `<div class="admin-cv-preview-table">${xlsx.utils.sheet_to_html(sheet, { editable: false })}</div>`
-          : PREVIEW_FAILED;
-      };
-      reader.onerror = () => {
-        target.innerHTML = PREVIEW_FAILED;
-      };
-      reader.readAsArrayBuffer(dataUrlToBlob(app.cvFileData, app.cvFileType));
-    } catch {
-      target.innerHTML = PREVIEW_FAILED;
-    }
-    return;
-  }
-
-  if (type.startsWith('text/') || ext === 'txt') {
-    try {
-      const binary = atob(app.cvFileData.split(',')[1] ?? '');
-      const text = new TextDecoder().decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
-      target.innerHTML = `<pre class="admin-cv-preview-text">${escapeHtml(text)}</pre>`;
-    } catch {
-      target.innerHTML = PREVIEW_FAILED;
-    }
-    return;
-  }
-
-  target.innerHTML =
-    '<div class="admin-cv-preview-empty">Bu dosya türü için önizleme yok. Görüntülemek için yeni sekmede açın.</div>';
 }
 
 // ---------------------------------------------------------
@@ -498,12 +456,17 @@ function initModal(): void {
   });
 }
 
+/** Görsel alanının seçilen dosyasını yükleyip yolunu saklar. */
+const yuklenenYollar = new Map<string, string>();
+
 function openModal(id: string | null): void {
-  if (state.section === 'applications') return;
+  const config = COLLECTIONS[state.section];
+  if (!config) return;
 
   state.editingId = id;
-  const config = COLLECTIONS[state.section];
-  const item = id ? window.AkerStore.getById(state.section, id) : null;
+  yuklenenYollar.clear();
+
+  const item = id ? state.kayitlar.find((k) => k.id === id) : undefined;
 
   const titleEl = byId('modal-title');
   const form = byId('admin-form');
@@ -514,7 +477,7 @@ function openModal(id: string | null): void {
 
   form.innerHTML = config.fields
     .map((field) => {
-      const value = fieldValue(item, field.key);
+      const value = item?.[field.key] ?? '';
 
       if (field.type === 'textarea') {
         return `<div class="admin-field"><label for="alan-${field.key}">${escapeHtml(field.label)}</label><textarea id="alan-${field.key}" name="${field.key}">${escapeHtml(value)}</textarea></div>`;
@@ -524,7 +487,13 @@ function openModal(id: string | null): void {
         const preview = value
           ? `<img class="admin-image-preview" src="${escapeAttr(value)}" alt="">`
           : '<div class="admin-image-preview admin-image-preview-empty">Görsel yok</div>';
-        return `<div class="admin-field"><label for="alan-${field.key}">${escapeHtml(field.label)}</label>${preview}<input type="file" id="alan-${field.key}" accept="image/*" name="${field.key}"></div>`;
+        return (
+          `<div class="admin-field" data-image-field="${field.key}">` +
+          `<label for="alan-${field.key}">${escapeHtml(field.label)}</label>${preview}` +
+          `<input type="file" id="alan-${field.key}" accept="image/*" data-field="${field.key}">` +
+          `<input type="hidden" name="${field.key}" value="${escapeAttr(value)}">` +
+          '<div class="admin-field-durum"></div></div>'
+        );
       }
 
       return `<div class="admin-field"><label for="alan-${field.key}">${escapeHtml(field.label)}</label><input type="text" id="alan-${field.key}" name="${field.key}" value="${escapeAttr(value)}"></div>`;
@@ -532,28 +501,44 @@ function openModal(id: string | null): void {
     .join('');
 
   for (const input of qsa<HTMLInputElement>('input[type="file"]', form)) {
-    input.addEventListener('change', () => {
-      const file = input.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const preview = input.parentElement?.querySelector('.admin-image-preview');
-        if (preview instanceof HTMLImageElement) {
-          preview.src = String(reader.result ?? '');
-        } else if (preview) {
-          const img = document.createElement('img');
-          img.className = 'admin-image-preview';
-          img.alt = '';
-          img.src = String(reader.result ?? '');
-          preview.replaceWith(img);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    input.addEventListener('change', () => void gorselSec(input));
   }
 
   modal.style.display = 'flex';
+}
+
+async function gorselSec(input: HTMLInputElement): Promise<void> {
+  const file = input.files?.[0];
+  const alan = input.dataset['field'] ?? '';
+  const kapsayici = input.closest('.admin-field');
+  const durum = kapsayici ? qs('.admin-field-durum', kapsayici) : null;
+  if (!file || !kapsayici) return;
+
+  if (durum) durum.textContent = 'Yükleniyor…';
+
+  try {
+    const yol = await api.gorselYukle(file);
+    yuklenenYollar.set(alan, yol);
+
+    const gizli = qs<HTMLInputElement>(`input[type="hidden"][name="${alan}"]`, kapsayici);
+    if (gizli) gizli.value = yol;
+
+    const onizleme = kapsayici.querySelector('.admin-image-preview');
+    if (onizleme instanceof HTMLImageElement) {
+      onizleme.src = yol;
+    } else if (onizleme) {
+      const img = document.createElement('img');
+      img.className = 'admin-image-preview';
+      img.alt = '';
+      img.src = yol;
+      onizleme.replaceWith(img);
+    }
+
+    if (durum) durum.textContent = 'Yüklendi.';
+  } catch (err) {
+    if (durum) durum.textContent = err instanceof Error ? err.message : 'Yüklenemedi.';
+    input.value = '';
+  }
 }
 
 function closeModal(): void {
@@ -562,116 +547,42 @@ function closeModal(): void {
 }
 
 async function saveModal(): Promise<void> {
-  if (state.section === 'applications') return;
-
-  const section = state.section;
-  const config = COLLECTIONS[section];
+  const config = COLLECTIONS[state.section];
   const form = byId('admin-form');
-  if (!form) return;
+  const saveBtn = byId<HTMLButtonElement>('modal-save');
+  if (!config || !form) return;
 
-  const existing = state.editingId ? window.AkerStore.getById(section, state.editingId) : null;
-  const changes: Record<string, string> = {};
-
+  const kayit: Record<string, string> = {};
   for (const field of config.fields) {
     const input = qs<HTMLInputElement | HTMLTextAreaElement>(`[name="${field.key}"]`, form);
-    if (!input) continue;
+    kayit[field.key] = yuklenenYollar.get(field.key) ?? input?.value ?? '';
+  }
 
-    if (field.type === 'image') {
-      const file = input instanceof HTMLInputElement ? input.files?.[0] : undefined;
-      changes[field.key] = file ? await compressImage(file) : fieldValue(existing, field.key);
+  if (saveBtn) saveBtn.disabled = true;
+
+  try {
+    if (state.editingId) await api.guncelle(state.section, state.editingId, kayit);
+    else await api.ekle(state.section, kayit);
+
+    closeModal();
+    await renderSection();
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 422) {
+      alert(err.message);
     } else {
-      changes[field.key] = input.value;
+      hatayiIsle(err);
+      closeModal();
     }
+  } finally {
+    if (saveBtn) saveBtn.disabled = false;
   }
-
-  if (state.editingId) {
-    window.AkerStore.update(section, state.editingId, changes as never);
-  } else {
-    window.AkerStore.add(section, changes as never);
-  }
-
-  closeModal();
-  renderSection();
 }
 
-function readFileAsDataURL(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ''));
-    reader.onerror = () => reject(new Error('Dosya okunamadı'));
-    reader.readAsDataURL(file);
-  });
-}
-
-// Görselleri localStorage kotasını aşmamak için yeniden boyutlandırıp sıkıştırır
-// (büyük telefon fotoğrafları MB'lardan KB'lara düşer).
-const MAX_IMAGE_DIMENSION = 1200;
-const JPEG_QUALITY = 0.82;
-const MAX_OUTPUT_BYTES = 700 * 1024;
-
-async function compressImage(file: File): Promise<string> {
-  const dataUrl = await readFileAsDataURL(file);
-
-  return new Promise((resolve) => {
-    const img = new Image();
-
-    img.onload = () => {
-      const { naturalWidth: width, naturalHeight: height } = img;
-      const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(width, height));
-      const isLossless = file.type === 'image/png' || file.type === 'image/gif';
-
-      if (scale === 1 && file.size <= MAX_OUTPUT_BYTES) {
-        resolve(dataUrl);
-        return;
-      }
-
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.max(1, Math.round(width * scale));
-      canvas.height = Math.max(1, Math.round(height * scale));
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        resolve(dataUrl);
-        return;
-      }
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      if (isLossless) {
-        resolve(canvas.toDataURL('image/png'));
-        return;
-      }
-
-      let quality = JPEG_QUALITY;
-      let result = canvas.toDataURL('image/jpeg', quality);
-      while (result.length > MAX_OUTPUT_BYTES && quality > 0.4) {
-        quality -= 0.1;
-        result = canvas.toDataURL('image/jpeg', quality);
-      }
-      resolve(result);
-    };
-
-    img.onerror = () => resolve(dataUrl);
-    img.src = dataUrl;
-  });
-}
-
-// ---------------------------------------------------------
-// Sıfırlama
-// ---------------------------------------------------------
-function initReset(): void {
-  byId('reset-btn')?.addEventListener('click', () => {
-    if (confirm('Tüm içerikler varsayılan haline döndürülecek. Onaylıyor musunuz?')) {
-      window.AkerStore.reset();
-      renderSection();
-    }
-  });
-}
-
-// ---------------------------------------------------------
-// Yardımcı
 // ---------------------------------------------------------
 function formatDate(isoString: string): string {
-  const date = new Date(isoString);
+  // D1 'YYYY-MM-DD HH:MM:SS' biçiminde UTC döndürür.
+  const normalize = isoString.includes('T') ? isoString : `${isoString.replace(' ', 'T')}Z`;
+  const date = new Date(normalize);
   if (Number.isNaN(date.getTime())) return '-';
   return date.toLocaleString('tr-TR', {
     day: '2-digit',

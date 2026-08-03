@@ -18,7 +18,18 @@ import { fileURLToPath } from 'node:url';
 import { SITE, BRANCHES, NAV, FOOTER_LINKS, type Branch } from './site.ts';
 import { SERVICES, type FaqEntry, type Service } from './content/hizmetler.ts';
 import { PAGES, type ContentBlock } from './content/sayfalar.ts';
+import { KVKK_PARAGRAFLARI } from './content/kvkk.ts';
 import { DEFAULT_DATA } from '../src/cms-data.ts';
+import {
+  renderCareerCards,
+  renderCareerList,
+  renderClients,
+  renderDocuments,
+  renderJobDetail,
+  renderNews,
+  renderSlides,
+  renderTeam,
+} from '../src/render.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -434,17 +445,11 @@ function dimsFor(src: string): string {
 }
 
 function careerCards(): string {
-  const cards = DEFAULT_DATA.careers.map(
-    (c) => `      <li class="career-item">
-        <div class="career-item-image"><img src="${c.cardImage}" alt="${esc(c.title)}"${dimsFor(c.cardImage)} loading="lazy" decoding="async"></div>
-        <div class="career-item-body">
-          <h3 class="career-item-title">${esc(c.title)}</h3>
-          <p class="career-item-text">${esc(c.text)}</p>
-          <a class="career-item-btn" href="/isbasvuru?id=${c.id}">Detayları gör ve başvur</a>
-        </div>
-      </li>`
-  );
-  return `    <ul class="career-list">\n${cards.join('\n')}\n    </ul>`;
+  return `    <!-- kariyer-liste:start -->
+    <ul class="career-list">
+${renderCareerList(DEFAULT_DATA.careers)}
+    </ul>
+    <!-- kariyer-liste:end -->`;
 }
 
 // ---------------------------------------------------------
@@ -466,87 +471,32 @@ ${SERVICES.map(
 }
 
 function newsGridBlock(): string {
-  const news = DEFAULT_DATA.news;
-  return `      <div class="bubble-element news-grid">
-${news
-    .map((n) => {
-      const link = n.link && n.link.trim();
-      const open = link
-        ? `<a class="news-card" href="${esc(link)}" target="_blank" rel="noopener">`
-        : '<div class="news-card">';
-      const close = link ? '</a>' : '</div>';
-      return `        ${open}
-          <div class="news-card-shadow">
-            <div class="news-card-image" style="background-image: url(&quot;${n.image}&quot;);" role="img" aria-label="${esc(n.title)}"></div>
-            <div class="news-card-body">
-              <h3 class="news-card-title">${esc(n.title)}</h3>
-              <p class="news-card-text">${esc(n.text)}</p>
-            </div>
-          </div>
-        ${close}`;
-    })
-    .join('\n')}
-      </div>`;
+  return `      <div class="bubble-element news-grid">\n${renderNews(DEFAULT_DATA.news)}\n      </div>`;
 }
 
 function careersGridBlock(): string {
-  const careers = DEFAULT_DATA.careers;
-  return `      <div class="bubble-element careers-grid">
-${careers
-    .map(
-      (c) => `        <div class="career-card">
-          <div class="career-card-shadow">
-            <div class="career-card-image" style="background-image: url(&quot;${c.cardImage}&quot;);" role="img" aria-label="${esc(c.title)}"></div>
-            <div class="career-card-body">
-              <h3 class="career-card-title">${esc(c.title)}</h3>
-              <p class="career-card-text">${esc(c.text)}</p>
-              <a class="career-btn" href="/isbasvuru?id=${c.id}">Detayları Gör</a>
-            </div>
-          </div>
-        </div>`
-    )
-    .join('\n')}
-      </div>`;
+  return `      <div class="bubble-element careers-grid">\n${renderCareerCards(DEFAULT_DATA.careers)}\n      </div>`;
 }
 
 function clientsBlock(): string {
-  const clients = DEFAULT_DATA.clients;
-  return `      <div class="swiper-wrapper clients-slides-wrapper">
-${clients
-    .map(
-      (c) => `        <div class="swiper-slide"><img src="${c.image}" alt="${esc(c.alt || 'AKER OSGB referansı')}"${dimsFor(c.image)} class="client-logo" loading="lazy" decoding="async"></div>`
-    )
-    .join('\n')}
-      </div>`;
+  return `      <div class="swiper-wrapper clients-slides-wrapper">\n${renderClients(DEFAULT_DATA.clients)}\n      </div>`;
+}
+
+function heroSlidesBlock(): string {
+  return renderSlides(DEFAULT_DATA.slides);
+}
+
+function jobDetailBlock(): string {
+  const ilan = DEFAULT_DATA.careers[0];
+  return ilan ? renderJobDetail(ilan) : '';
 }
 
 function documentsGridBlock(): string {
-  const docs = DEFAULT_DATA.documents;
-  return `    <div class="bubble-element documents-grid">
-${docs
-    .map(
-      (d) => `      <div class="document-card">
-        <h2 class="document-title">${esc(d.title)}</h2>
-        <div class="document-image"><img src="${d.image}" alt="${esc(d.title)} belgesi"${dimsFor(d.image)} class="document-img" loading="lazy" decoding="async"></div>
-      </div>`
-    )
-    .join('\n')}
-    </div>`;
+  return `    <div class="bubble-element documents-grid">\n${renderDocuments(DEFAULT_DATA.documents)}\n    </div>`;
 }
 
 function teamGridBlock(): string {
-  const team = DEFAULT_DATA.team;
-  return `    <div class="bubble-element team-grid">
-${team
-    .map(
-      (t) => `      <div class="team-card">
-        <div class="team-photo" style="background-image: url(&quot;${t.photo}&quot;);" role="img" aria-label="${esc(t.name)}"></div>
-        <h2 class="team-name">${esc(t.name)}</h2>
-        <div class="team-role">${esc(t.role)}</div>
-      </div>`
-    )
-    .join('\n')}
-    </div>`;
+  return `    <div class="bubble-element team-grid">\n${renderTeam(DEFAULT_DATA.team)}\n    </div>`;
 }
 
 const ICON_PIN = '<svg viewBox="0 0 24 24" class="location-svg" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>';
@@ -806,15 +756,9 @@ for (const p of PAGES) {
 
 // KVKK sayfası - metin index.html içindeki mevcut sözleşmeden alınır
 {
-  const indexSrc = readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  const m = indexSrc.match(/<div class="kvkk-modal-body">([\s\S]*?)<\/div>/);
-  const raw = m?.[1]?.trim() ?? '';
-  const paragraphs = raw
-    .split(/\n\s*\n/)
-    .map((t) => t.trim())
-    .filter(Boolean)
-    .map((t) => `    <p>${t.replace(/\n/g, '<br>')}</p>`)
-    .join('\n');
+  const paragraphs = KVKK_PARAGRAFLARI.map(
+    (t) => `    <p>${esc(t).replace(/\n/g, '<br>')}</p>`,
+  ).join('\n');
 
   const page = {
     path: '/kvkk',
@@ -933,6 +877,7 @@ function injectBlock(src: string, name: string, content: string): string {
 // Sayfaya özgü statik içerik blokları
 const EXTRA_BLOCKS: Record<string, Record<string, () => string>> = {
   'index.html': {
+    'hero-slaytlar': heroSlidesBlock,
     hizmetler: servicesGridBlock,
     haberler: newsGridBlock,
     kariyer: careersGridBlock,
@@ -941,6 +886,7 @@ const EXTRA_BLOCKS: Record<string, Record<string, () => string>> = {
   },
   'belgelerimiz.html': { belgeler: documentsGridBlock },
   'ekibimiz.html': { ekip: teamGridBlock },
+  'isbasvuru.html': { 'ilan-detay': jobDetailBlock },
 };
 
 for (const page of MANUAL_PAGES) {

@@ -1,3 +1,13 @@
+# Lokal geliştirme değişkenleri. Bu dosyayı .dev.vars olarak kopyalayın.
+# Canlıda Cloudflare Pages > Settings > Environment variables altına girilir.
+
+# Yönetim paneli şifresi
+ADMIN_PASSWORD=degistirin
+
+# Oturum çerezini imzalayan anahtar (uzun ve rastgele olmalı)
+SESSION_SECRET=degistirin
+
+# İletişim formu e-postası (Resend)
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxx
 CONTACT_TO_EMAIL=developer@flowick.com
 MAIL_FROM=AKER OSGB İletişim Formu <no-reply@flowick.com>
