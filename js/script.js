@@ -18,18 +18,24 @@ document.addEventListener('DOMContentLoaded', function () {
   initNewsletterForm();
 });
 
+// Statik HTML'de zaten basılı olan bölümler, yalnızca yönetim
+// panelinden bu tarayıcıda kayıt yapılmışsa yeniden çizilir.
+function shouldRerender() {
+  return !!(window.AkerStore && window.AkerStore.hasCustomData && window.AkerStore.hasCustomData());
+}
+
 // ---------------------------------------------------------
 // Ana Sayfa Slider Görselleri (dinamik)
 // ---------------------------------------------------------
 function renderHeroSlides() {
   var wrapper = document.querySelector('.hero-slides-wrapper');
-  if (!wrapper || !window.AkerStore) return;
+  if (!wrapper || !shouldRerender()) return;
 
   var slides = window.AkerStore.getAll('slides');
   wrapper.innerHTML = slides.map(function (slide) {
     return '' +
       '<div class="swiper-slide">' +
-        '<img loading="lazy" src="' + slide.image + '" class="slide-img">' +
+        '<img loading="lazy" decoding="async" src="' + escapeAttr(slide.image) + '" alt="AKER OSGB tanıtım görseli" class="slide-img">' +
       '</div>';
   }).join('');
 }
@@ -39,11 +45,12 @@ function renderHeroSlides() {
 // ---------------------------------------------------------
 function renderClientLogos() {
   var wrapper = document.querySelector('.clients-slides-wrapper');
-  if (!wrapper || !window.AkerStore) return;
+  if (!wrapper || !shouldRerender()) return;
 
   var clients = window.AkerStore.getAll('clients');
   wrapper.innerHTML = clients.map(function (client) {
-    return '<div class="swiper-slide"><img loading="lazy" src="' + client.image + '" class="client-logo"></div>';
+    var alt = client.alt || 'AKER OSGB referansı';
+    return '<div class="swiper-slide"><img loading="lazy" decoding="async" src="' + escapeAttr(client.image) + '" alt="' + escapeAttr(alt) + '" class="client-logo"></div>';
   }).join('');
 }
 
@@ -52,18 +59,18 @@ function renderClientLogos() {
 // ---------------------------------------------------------
 function renderCareers() {
   var grid = document.querySelector('.careers-grid');
-  if (!grid || !window.AkerStore) return;
+  if (!grid || !shouldRerender()) return;
 
   var careers = window.AkerStore.getAll('careers');
   grid.innerHTML = careers.map(function (career) {
     return '' +
       '<div class="career-card">' +
         '<div class="career-card-shadow">' +
-          '<div class="career-card-image" style="background-image: url(&quot;' + career.cardImage + '&quot;);"></div>' +
+          '<div class="career-card-image" style="background-image: url(&quot;' + escapeAttr(career.cardImage) + '&quot;);" role="img" aria-label="' + escapeAttr(career.title) + '"></div>' +
           '<div class="career-card-body">' +
-            '<div class="career-card-title">' + career.title + '</div>' +
-            '<div class="career-card-text">' + career.text + '</div>' +
-            '<a class="clickable-element career-btn" href="isbasvuru.html?id=' + encodeURIComponent(career.id) + '">Detayları Gör</a>' +
+            '<h3 class="career-card-title">' + escapeAttr(career.title) + '</h3>' +
+            '<p class="career-card-text">' + escapeAttr(career.text) + '</p>' +
+            '<a class="career-btn" href="/isbasvuru?id=' + encodeURIComponent(career.id) + '">Detayları Gör</a>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -75,7 +82,7 @@ function renderCareers() {
 // ---------------------------------------------------------
 function renderNews() {
   var grid = document.querySelector('.news-grid');
-  if (!grid || !window.AkerStore) return;
+  if (!grid || !shouldRerender()) return;
 
   var news = window.AkerStore.getAll('news');
   grid.innerHTML = news.map(function (item) {
@@ -87,10 +94,10 @@ function renderNews() {
     return '' +
       tagOpen +
         '<div class="news-card-shadow">' +
-          '<div class="news-card-image" style="background-image: url(&quot;' + item.image + '&quot;);"></div>' +
+          '<div class="news-card-image" style="background-image: url(&quot;' + escapeAttr(item.image) + '&quot;);" role="img" aria-label="' + escapeAttr(item.title) + '"></div>' +
           '<div class="news-card-body">' +
-            '<div class="news-card-title">' + item.title + '</div>' +
-            '<div class="news-card-text">' + item.text + '</div>' +
+            '<h3 class="news-card-title">' + escapeAttr(item.title) + '</h3>' +
+            '<p class="news-card-text">' + escapeAttr(item.text) + '</p>' +
           '</div>' +
         '</div>' +
       tagClose;
@@ -110,14 +117,14 @@ function escapeAttr(value) {
 // ---------------------------------------------------------
 function renderDocuments() {
   var grid = document.querySelector('.documents-grid');
-  if (!grid || !window.AkerStore) return;
+  if (!grid || !shouldRerender()) return;
 
   var documents = window.AkerStore.getAll('documents');
   grid.innerHTML = documents.map(function (doc) {
     return '' +
       '<div class="document-card">' +
-        '<div class="document-title">' + doc.title + '</div>' +
-        '<div class="document-image"><img loading="lazy" src="' + doc.image + '" class="document-img"></div>' +
+        '<h2 class="document-title">' + escapeAttr(doc.title) + '</h2>' +
+        '<div class="document-image"><img loading="lazy" decoding="async" src="' + escapeAttr(doc.image) + '" alt="' + escapeAttr(doc.title) + ' belgesi" class="document-img"></div>' +
       '</div>';
   }).join('');
 }
@@ -127,15 +134,15 @@ function renderDocuments() {
 // ---------------------------------------------------------
 function renderTeam() {
   var grid = document.querySelector('.team-grid');
-  if (!grid || !window.AkerStore) return;
+  if (!grid || !shouldRerender()) return;
 
   var team = window.AkerStore.getAll('team');
   grid.innerHTML = team.map(function (member) {
     return '' +
       '<div class="team-card">' +
-        '<div class="team-photo" style="background-image: url(&quot;' + member.photo + '&quot;);"></div>' +
-        '<h2 class="team-name">' + member.name + '</h2>' +
-        '<div class="team-role">' + member.role + '</div>' +
+        '<div class="team-photo" style="background-image: url(&quot;' + escapeAttr(member.photo) + '&quot;);" role="img" aria-label="' + escapeAttr(member.name) + '"></div>' +
+        '<h2 class="team-name">' + escapeAttr(member.name) + '</h2>' +
+        '<div class="team-role">' + escapeAttr(member.role) + '</div>' +
       '</div>';
   }).join('');
 }
@@ -162,8 +169,6 @@ function initJobDetail() {
 
   var form = section.querySelector('.application-form');
   if (form) form.dataset.careerId = career.id;
-
-  document.title = 'İş Başvurusu | AKER OSGB';
 }
 
 // ---------------------------------------------------------

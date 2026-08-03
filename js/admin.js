@@ -11,7 +11,8 @@
     clients: {
       label: 'Referanslar',
       fields: [
-        { key: 'image', label: 'Logo', type: 'image' }
+        { key: 'image', label: 'Logo', type: 'image' },
+        { key: 'alt', label: 'Firma adı (görsel alt metni)', type: 'text' }
       ],
       columns: [
         { key: 'image', label: '', type: 'image' }
