@@ -111,9 +111,18 @@ Pages projesi `aker-website` (production branch: `master`).
 Gerekli secret'lar (Pages → Settings → Environment variables):
 `ADMIN_PASSWORD`, `SESSION_SECRET`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `MAIL_FROM`.
 
-**Resend hesabı:** Bubble'daki Flowick BPM uygulamasında kullanılan Resend hesabının
-**aynısı** kullanılacak — yeni hesap açılmayacak. `RESEND_API_KEY` oradan alınır,
-doğrulanmış gönderen alan adı da o hesaptaki alan adıdır.
+**Resend hesabı:** Flowick ile **ortak hesap** kullanılıyor — AKER için ayrı hesap
+açılmadı. Aynı hesap Bubble'daki Flowick BPM uygulamasında ve `flowick-website`
+reposunda da kullanılıyor; entegrasyon deseni birebir aynı (Resend HTTP API,
+`POST /emails`, Bearer anahtar, `from`/`to`/`reply_to`).
+
+Hesapta **doğrulanmış tek alan adı `flowick.com`**. Bu yüzden `MAIL_FROM` mutlaka
+`@flowick.com` adresi olmalı (`AKER OSGB <no-reply@flowick.com>`). `akerosgb.com.tr`
+üzerinden gönderim istenirse önce o alan adı Resend'e eklenip SPF/DKIM kayıtları
+girilmeli. Alıcı (`CONTACT_TO_EMAIL`) canlıda `info@akerosgb.com.tr`, lokalde
+`developer@flowick.com`.
+
+Anahtar repoya **girmez**: lokalde `.dev.vars` (gitignore'lu), canlıda Pages secret.
 
 ---
 

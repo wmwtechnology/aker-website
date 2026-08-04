@@ -233,16 +233,25 @@ Canlıda `CONTACT_TO_EMAIL` ve `MAIL_FROM` **tanımlı değil**. Bu hâliyle:
 Alan adı Pages'e bağlanmadan **önce** çözülmeli, yoksa siteye giren ilk müşteri
 formu doldurduğunda hata alır.
 
-**KARAR (2026-08-04): Resend hesabı = Bubble'daki Flowick BPM uygulamasının kullandığı
-hesabın aynısı.** Yeni Resend hesabı açılmayacak; `RESEND_API_KEY` o hesaptan alınacak,
-gönderen alan adı da o hesapta doğrulanmış olan alan adı olacak.
+**KARAR (2026-08-04): Resend hesabı = Flowick ile ortak hesap.** AKER için ayrı hesap
+açılmadı. Aynı hesap Bubble'daki Flowick BPM uygulamasında ve `flowick-website`
+reposunda kullanılıyor; entegrasyon deseni birebir aynı — `flowick-website`
+`functions/api/contact.ts:43` ile AKER `functions/_lib/mail.ts:22` ikisi de
+`POST https://api.resend.com/emails` + Bearer + `from`/`to`/`reply_to` kullanıyor.
+Kod tarafında değişiklik gerekmedi; yalnızca değişken adları farklı
+(Flowick `FROM_EMAIL`/`TO_EMAIL`, AKER `MAIL_FROM`/`CONTACT_TO_EMAIL`).
 
-Karar verilecekler:
-1. **Alıcı** — `info@akerosgb.com.tr` (kullanıcı bunu seçti).
-2. **Gönderen** — Flowick BPM'in Resend hesabında doğrulanmış alan adı ne ise o.
-   `flowick.com` doğrulanmışsa `no-reply@flowick.com` hemen çalışır.
-   `akerosgb.com.tr` tercih edilecekse önce o hesaba eklenip SPF/DKIM kayıtları
-   girilmeli (alan adı zaten Cloudflare'de).
+AKER için ayrı bir `RESEND_API_KEY` üretildi ve lokal `.dev.vars`'a girildi
+(gitignore'lu; repoya **girmez**). Canlıya Pages secret olarak eklenmesi gerekiyor.
+
+Hesapta **doğrulanmış tek alan adı: `flowick.com`** (Resend API ile doğrulandı —
+`status: verified`, `sending: enabled`, bölge `eu-west-1`). Sonuç:
+1. **Gönderen** — `MAIL_FROM` mutlaka `@flowick.com` olmalı:
+   `AKER OSGB <no-reply@flowick.com>`. `akerosgb.com.tr` üzerinden gönderim
+   istenirse önce o alan adı Resend'e eklenip SPF/DKIM kayıtları girilmeli
+   (alan adı zaten Cloudflare'de).
+2. **Alıcı** — canlıda `info@akerosgb.com.tr` (kullanıcı bunu seçti),
+   lokalde `developer@flowick.com`.
 
 Değerler belirlenince:
 
