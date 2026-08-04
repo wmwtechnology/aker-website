@@ -203,8 +203,9 @@ sunar. Böylece deploy davranışı TypeScript öncesiyle aynı kalır.
    - R2 kovası `aker-website-media` oluşturuldu
    - `ADMIN_PASSWORD` ve `SESSION_SECRET` Pages secret olarak tanımlandı
    - Site `aker-website` Pages projesine deploy edildi (production branch: `master`)
-   - **Eksik:** `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `MAIL_FROM` — bunlar girilene kadar
-     iletişim formu e-posta göndermez (başvurular yine de veri tabanına kaydedilir).
+   - ~~**Eksik:** `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `MAIL_FROM`~~ — **2026-08-04
+     itibarıyla üçü de tanımlı** (bkz. "Canlı secret durumu"). Değerleri ve
+     çalıştığı doğrulanmadı.
 
 1. ~~Cloudflare Pages projesi bağlanır~~ — **TAMAMLANDI**. Deploy komutu:
 
@@ -231,13 +232,30 @@ sunar. Böylece deploy davranışı TypeScript öncesiyle aynı kalır.
 
 ## YARININ İLK İŞİ: iletişim formu e-postası
 
-Canlıda `CONTACT_TO_EMAIL` ve `MAIL_FROM` **tanımlı değil**. Bu hâliyle:
+### Canlı secret durumu — 2026-08-04'te ölçüldü
 
-- İletişim formu gönderilemiyor; kullanıcı "Gönderilemedi, lütfen tekrar deneyin." görüyor.
-- İş başvuruları panele kaydediliyor ama bildirim e-postası gitmiyor.
+> **DÜZELTME:** Bu bölümde daha önce "canlıda `CONTACT_TO_EMAIL` ve `MAIL_FROM`
+> tanımlı değil" yazıyordu. Artık doğru değil.
 
-Alan adı Pages'e bağlanmadan **önce** çözülmeli, yoksa siteye giren ilk müşteri
-formu doldurduğunda hata alır.
+`npx wrangler pages secret list --project-name aker-website` çıktısı: production
+ortamında **beş secret'ın hepsi tanımlı** — `ADMIN_PASSWORD`, `SESSION_SECRET`,
+`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `MAIL_FROM`.
+
+Buna rağmen e-posta akışının çalıştığı **doğrulanmış değil**. Üç sebep:
+
+1. **Değerler şifreli.** Wrangler yalnızca "Value Encrypted" gösteriyor;
+   `RESEND_API_KEY`'in güncel anahtar mı, `MAIL_FROM`'un hangi adres olduğu
+   dışarıdan görülemiyor.
+2. **Ortam değişkenleri dağıtım anında bağlanır.** Son dağıtım `ee5bcce`
+   (2026-08-03). Secret'lar o dağıtımdan sonra eklendiyse çalışan sürümde yoktur;
+   etkili olması için yeniden deploy gerekir.
+3. **Alan adı hâlâ Bubble'da.** `akerosgb.com.tr` bu Pages projesine gelmiyor,
+   dolayısıyla gerçek form trafiği yok — hata da başarı da gözlemlenemiyor.
+
+Doğrulamanın tek yolu: deploy atıp `pages.dev` üzerinden gerçek gönderim denemek.
+**Engel:** `aker-website.pages.dev` bu ağdan açılmıyor (TLS SNI engeli). GET için
+`curl https://r.jina.ai/<adres>` vekili çalışıyor ama form POST'u bu yolla atılamaz.
+Gönderim testi ya başka bir ağdan ya da alan adı bağlandıktan sonra yapılmalı.
 
 **KARAR (2026-08-04): Resend hesabı = Flowick ile ortak hesap.** AKER için ayrı hesap
 açılmadı. Aynı hesap Bubble'daki Flowick BPM uygulamasında ve `flowick-website`
