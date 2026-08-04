@@ -124,14 +124,25 @@ reposunda da kullanılıyor; entegrasyon deseni birebir aynı (Resend HTTP API,
 Hesapta şu an doğrulanmış tek alan adı `flowick.com`, o yüzden **lokal testte**
 `MAIL_FROM = AKER OSGB <no-reply@flowick.com>` kullanılıyor. Bu geçici çözümdür.
 
+> **🚨 Alan adı taşınırken AKER'in mevcut e-postası kesilebilir.**
+> `akerosgb.com.tr` postası Cloudflare'de değil, `mail.trmail.com.tr` üzerinde
+> (`MX 10 mail.trmail.com.tr`, `TXT "v=spf1 a mx include:relay.mailbaby.net ~all"`).
+> Taşımada bu kayıtlar birebir kopyalanmazsa gelen postanın tamamı düşer. Ayrıca
+> bir alan adında tek `v=spf1` kaydı olabilir — Resend eklenirken mevcut SPF'in
+> üzerine yazılmamalı; doğrulama `send.akerosgb.com.tr` alt alan adında yapılmalı.
+> Ayrıntı: `docs/NEREDE-KALDIK.md` → "TAŞIMADAN ÖNCE OKU".
+
 Kalıcı kurulum (AKER'den cevap gelince):
-1. `akerosgb.com.tr` Resend'e alan adı olarak eklenir.
-2. Resend'in verdiği SPF/DKIM (+ DMARC) kayıtları alan adının DNS'ine girilir.
-3. Doğrulama `verified` olunca `MAIL_FROM` `@akerosgb.com.tr` adresine çevrilir
+1. Taşımadan önce mevcut DNS kayıtlarının dökümü alınır, taşıma sonrası doğrulanır.
+2. `akerosgb.com.tr` Resend'e eklenir (tercihen `send.` alt alan adı).
+3. Resend'in verdiği DKIM/SPF kayıtları DNS'e girilir, kök SPF'e dokunulmaz.
+4. Doğrulama `verified` olunca `MAIL_FROM` `@akerosgb.com.tr` adresine çevrilir
    ve Pages secret güncellenir.
 
-Alıcı (`CONTACT_TO_EMAIL`) canlıda `info@akerosgb.com.tr`, lokalde
-`developer@flowick.com`.
+**Alıcı:** `CONTACT_TO_EMAIL = info@akerosgb.com.tr` (kesinleşti) — form, iş başvurusu
+ve bülten bildirimleri buraya düşer. Alıcı tarafı için Resend'de **kurulum ve anahtar
+gerekmez**; posta almak API anahtarı istemez. Lokalde alıcı `developer@flowick.com`
+olarak kalıyor, AKER'in kutusuna test mesajı düşmesin diye.
 
 Anahtar repoya **girmez**: lokalde `.dev.vars` (gitignore'lu), canlıda Pages secret.
 

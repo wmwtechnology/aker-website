@@ -263,17 +263,60 @@ başvuru/iletişim bildirimlerinin `no-reply@flowick.com`'dan gitmesi kabul edil
 doğrulandı — `status: verified`, `sending: enabled`, bölge `eu-west-1`). Bu yüzden
 **yalnızca lokal testte** `MAIL_FROM = AKER OSGB <no-reply@flowick.com>` kullanılıyor.
 
-AKER'den cevap gelince yapılacaklar, sırayla:
-1. `akerosgb.com.tr` Resend'e alan adı olarak eklenir.
-2. Resend'in ürettiği SPF/DKIM (+ DMARC) kayıtları alan adının DNS'ine girilir.
-   Alan adı taşındıktan sonra DNS Cloudflare'de olacak.
-3. Resend'de durum `verified` olana kadar beklenir.
-4. `MAIL_FROM` `@akerosgb.com.tr` adresine çevrilir, Pages secret güncellenir,
-   yeniden deploy edilir.
-5. Gerçek gönderim denemesi yapılır, kutuya düştüğü ve spam'e gitmediği doğrulanır.
+### 🚨 TAŞIMADAN ÖNCE OKU: AKER'in mevcut e-postası başka sağlayıcıda
 
-**Alıcı** (`CONTACT_TO_EMAIL`) — canlıda `info@akerosgb.com.tr` (kullanıcı seçti),
-lokalde `developer@flowick.com`.
+`akerosgb.com.tr` alan adının e-posta hizmeti **Cloudflare'de değil**. 2026-08-04'te
+ölçülen canlı DNS kayıtları:
+
+```
+MX   10   mail.trmail.com.tr
+TXT       "v=spf1 a mx include:relay.mailbaby.net ~all"
+```
+
+Yani `info@akerosgb.com.tr` posta kutusu `trmail.com.tr` üzerinde barınıyor.
+
+**Alan adı Cloudflare'e taşınırken bu iki kayıt yeni DNS bölgesine birebir
+kopyalanmazsa AKER'in gelen e-postasının tamamı kesilir.** Bu, sitenin çalışmasından
+bağımsız ve müşteriye doğrudan zarar veren bir kesintidir; taşıma yapılmadan önce
+mevcut bölgedeki tüm kayıtların (MX, TXT/SPF, varsa DKIM ve autodiscover/webmail
+A-CNAME kayıtları) dökümü alınmalı, taşıma sonrası birebir doğrulanmalıdır.
+
+Doğrulama komutu (taşımadan önce ve sonra çalıştırılıp çıktılar karşılaştırılmalı):
+
+```bash
+nslookup -type=MX  akerosgb.com.tr 1.1.1.1
+nslookup -type=TXT akerosgb.com.tr 1.1.1.1
+```
+
+**SPF tuzağı:** Bir alan adında yalnızca **tek** `v=spf1` TXT kaydı bulunabilir.
+Resend eklenirken mevcut `v=spf1 a mx include:relay.mailbaby.net ~all` kaydının
+ÜZERİNE YAZILMAMALI — yazılırsa AKER'in kendi giden postası SPF'ten kalır. Güvenli
+yol: Resend doğrulamasını **alt alan adında** yapmak (`send.akerosgb.com.tr`), böylece
+kök SPF kaydına hiç dokunulmaz.
+
+### AKER'den cevap gelince yapılacaklar, sırayla
+
+1. Taşımadan önce mevcut DNS bölgesinin tam dökümü alınır (yukarıdaki uyarı).
+2. Alan adı taşınır; MX + SPF kayıtlarının aynen geldiği doğrulanır, e-posta
+   alımı gerçek bir test mesajıyla sınanır.
+3. `akerosgb.com.tr` Resend'e eklenir — tercihen `send.akerosgb.com.tr` alt alan adı.
+4. Resend'in ürettiği DKIM ve SPF kayıtları DNS'e girilir (kök SPF'e dokunmadan).
+5. Resend'de durum `verified` olana kadar beklenir.
+6. `MAIL_FROM` `@akerosgb.com.tr` adresine çevrilir, Pages secret güncellenir,
+   yeniden deploy edilir.
+7. Gerçek gönderim denemesi yapılır; `info@akerosgb.com.tr` kutusuna düştüğü ve
+   spam'e gitmediği doğrulanır.
+
+### Alıcı adresi
+
+**`CONTACT_TO_EMAIL = info@akerosgb.com.tr`** — kullanıcı 2026-08-04'te kesinleştirdi.
+İletişim formu, iş başvurusu ve bülten bildirimleri bu adrese düşecek.
+
+Alıcı tarafı için Resend'de **hiçbir kurulum ve anahtar gerekmez**; posta almak
+API anahtarı istemez, kutunun var olması yeterlidir. Anahtar yalnızca gönderim için.
+
+Lokal geliştirmede alıcı `developer@flowick.com` olarak kalıyor — AKER'in kutusuna
+test mesajı düşmesin diye bilinçli tercih.
 
 Değerler belirlenince:
 
@@ -291,6 +334,9 @@ Sonrasında gerçek bir gönderim denemesi yapılıp kutuya düştüğü doğrul
   `akerosgb.com.tr` taşınacak; sonrasında Resend'e eklenip SPF/DKIM doğrulanacak ve
   gönderen adres `@akerosgb.com.tr` olacak. **Geçici `@flowick.com` adresiyle canlıya
   çıkılmayacak.** Bu cevap gelmeden e-posta işi ve alan adı cutover'ı kapanmaz.
+  **🚨 Taşıma sırasında AKER'in mevcut e-postası kesilebilir** — posta `trmail.com.tr`
+  üzerinde, MX ve SPF kayıtları birebir taşınmalı. Ayrıntı: "TAŞIMADAN ÖNCE OKU"
+  bölümü. Ek API anahtarı gerekmiyor; alıcı taraf için Resend'de kurulum yok.
 - **Mevzuat rakamlarının doğrulanması (ÖNEMLİ).** Hizmet ve SSS sayfalarındaki süreler
   (görevlendirme dakikaları, risk değerlendirmesi ve eğitim yenileme aralıkları,
   ilkyardımcı oranları, periyodik muayene sıklıkları) 6331 sayılı Kanun ve ilgili
