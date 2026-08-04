@@ -1,7 +1,17 @@
 # AKER OSGB Sitesi — Nerede Kaldık
 
-Son güncelleme: 2026-08-03
+Son güncelleme: 2026-08-04
 Dal: `master`
+
+## Son oturum (2026-08-04) — lokal doğrulama
+
+`npm run dev:full` ile site ve yönetim paneli lokalde çalıştırıldı, elle test edildi.
+Doğrulananlar: genel sayfalar 200, D1 + R2 bağlı, panel girişi çerez üretiyor, altı
+içerik koleksiyonu tohum verisiyle dolu, gelen kutusu uçları (`applications`,
+`messages`, `subscribers`) boş ve 200, çerezsiz istek 401, middleware D1 içeriğini
+HTML'e enjekte ediyor. Kod değişikliği yapılmadı.
+
+Tek karar: aşağıdaki **Resend hesabı** maddesi (Flowick BPM ile ortak hesap).
 
 ## Durum özeti
 
@@ -223,11 +233,16 @@ Canlıda `CONTACT_TO_EMAIL` ve `MAIL_FROM` **tanımlı değil**. Bu hâliyle:
 Alan adı Pages'e bağlanmadan **önce** çözülmeli, yoksa siteye giren ilk müşteri
 formu doldurduğunda hata alır.
 
+**KARAR (2026-08-04): Resend hesabı = Bubble'daki Flowick BPM uygulamasının kullandığı
+hesabın aynısı.** Yeni Resend hesabı açılmayacak; `RESEND_API_KEY` o hesaptan alınacak,
+gönderen alan adı da o hesapta doğrulanmış olan alan adı olacak.
+
 Karar verilecekler:
 1. **Alıcı** — `info@akerosgb.com.tr` (kullanıcı bunu seçti).
-2. **Gönderen** — Resend'de hangi alan adı doğrulanmış? `flowick.com` doğrulanmışsa
-   `no-reply@flowick.com` hemen çalışır. `akerosgb.com.tr` tercih edilecekse önce
-   Resend'e eklenip SPF/DKIM kayıtları girilmeli (alan adı zaten Cloudflare'de).
+2. **Gönderen** — Flowick BPM'in Resend hesabında doğrulanmış alan adı ne ise o.
+   `flowick.com` doğrulanmışsa `no-reply@flowick.com` hemen çalışır.
+   `akerosgb.com.tr` tercih edilecekse önce o hesaba eklenip SPF/DKIM kayıtları
+   girilmeli (alan adı zaten Cloudflare'de).
 
 Değerler belirlenince:
 

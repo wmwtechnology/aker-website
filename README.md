@@ -111,6 +111,10 @@ Pages projesi `aker-website` (production branch: `master`).
 Gerekli secret'lar (Pages → Settings → Environment variables):
 `ADMIN_PASSWORD`, `SESSION_SECRET`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `MAIL_FROM`.
 
+**Resend hesabı:** Bubble'daki Flowick BPM uygulamasında kullanılan Resend hesabının
+**aynısı** kullanılacak — yeni hesap açılmayacak. `RESEND_API_KEY` oradan alınır,
+doğrulanmış gönderen alan adı da o hesaptaki alan adıdır.
+
 ---
 
 ## Dikkat edilecekler
