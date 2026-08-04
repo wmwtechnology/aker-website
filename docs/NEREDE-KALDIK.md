@@ -11,7 +11,13 @@ içerik koleksiyonu tohum verisiyle dolu, gelen kutusu uçları (`applications`,
 `messages`, `subscribers`) boş ve 200, çerezsiz istek 401, middleware D1 içeriğini
 HTML'e enjekte ediyor. Kod değişikliği yapılmadı.
 
-Tek karar: aşağıdaki **Resend hesabı** maddesi (Flowick BPM ile ortak hesap).
+Tek karar: aşağıdaki **Resend hesabı** maddesi (Flowick ile ortak hesap).
+
+### ⛔ EN KRİTİK ENGEL
+
+**Gönderen e-posta adresi `@flowick.com` OLARAK CANLIYA ÇIKMAYACAK.** AKER'in kendi
+alan adı taşınacak, gönderen `@akerosgb.com.tr` olacak. **AKER'den cevap bekleniyor.**
+Ayrıntı: "YARININ İLK İŞİ: iletişim formu e-postası" bölümü.
 
 ## Durum özeti
 
@@ -244,14 +250,30 @@ Kod tarafında değişiklik gerekmedi; yalnızca değişken adları farklı
 AKER için ayrı bir `RESEND_API_KEY` üretildi ve lokal `.dev.vars`'a girildi
 (gitignore'lu; repoya **girmez**). Canlıya Pages secret olarak eklenmesi gerekiyor.
 
-Hesapta **doğrulanmış tek alan adı: `flowick.com`** (Resend API ile doğrulandı —
-`status: verified`, `sending: enabled`, bölge `eu-west-1`). Sonuç:
-1. **Gönderen** — `MAIL_FROM` mutlaka `@flowick.com` olmalı:
-   `AKER OSGB <no-reply@flowick.com>`. `akerosgb.com.tr` üzerinden gönderim
-   istenirse önce o alan adı Resend'e eklenip SPF/DKIM kayıtları girilmeli
-   (alan adı zaten Cloudflare'de).
-2. **Alıcı** — canlıda `info@akerosgb.com.tr` (kullanıcı bunu seçti),
-   lokalde `developer@flowick.com`.
+### ⛔ ENGEL: gönderen alan adı — AKER'den cevap bekleniyor
+
+**`flowick.com` GEÇİCİDİR. Canlıya bu adresle ÇIKILMAYACAK.**
+
+AKER'in kendi alan adı (`akerosgb.com.tr`) taşınacak; gönderen adres
+`@akerosgb.com.tr` olacak. **Taşıma için AKER'den cevap bekleniyor** — bu gelmeden
+e-posta işi kapanmaz, canlıya alma tamamlanmaz. Bu maddeyi atlama: müşteriye giden
+başvuru/iletişim bildirimlerinin `no-reply@flowick.com`'dan gitmesi kabul edilmedi.
+
+Şu anki durum: hesapta doğrulanmış tek alan adı `flowick.com` (Resend API ile
+doğrulandı — `status: verified`, `sending: enabled`, bölge `eu-west-1`). Bu yüzden
+**yalnızca lokal testte** `MAIL_FROM = AKER OSGB <no-reply@flowick.com>` kullanılıyor.
+
+AKER'den cevap gelince yapılacaklar, sırayla:
+1. `akerosgb.com.tr` Resend'e alan adı olarak eklenir.
+2. Resend'in ürettiği SPF/DKIM (+ DMARC) kayıtları alan adının DNS'ine girilir.
+   Alan adı taşındıktan sonra DNS Cloudflare'de olacak.
+3. Resend'de durum `verified` olana kadar beklenir.
+4. `MAIL_FROM` `@akerosgb.com.tr` adresine çevrilir, Pages secret güncellenir,
+   yeniden deploy edilir.
+5. Gerçek gönderim denemesi yapılır, kutuya düştüğü ve spam'e gitmediği doğrulanır.
+
+**Alıcı** (`CONTACT_TO_EMAIL`) — canlıda `info@akerosgb.com.tr` (kullanıcı seçti),
+lokalde `developer@flowick.com`.
 
 Değerler belirlenince:
 
@@ -265,6 +287,10 @@ Sonrasında gerçek bir gönderim denemesi yapılıp kutuya düştüğü doğrul
 
 ## AÇIK İŞLER / DIŞ GİRDİ BEKLEYENLER
 
+- **⛔ AKER'in alan adının taşınması (EN KRİTİK, AKER'DEN CEVAP BEKLENİYOR).**
+  `akerosgb.com.tr` taşınacak; sonrasında Resend'e eklenip SPF/DKIM doğrulanacak ve
+  gönderen adres `@akerosgb.com.tr` olacak. **Geçici `@flowick.com` adresiyle canlıya
+  çıkılmayacak.** Bu cevap gelmeden e-posta işi ve alan adı cutover'ı kapanmaz.
 - **Mevzuat rakamlarının doğrulanması (ÖNEMLİ).** Hizmet ve SSS sayfalarındaki süreler
   (görevlendirme dakikaları, risk değerlendirmesi ve eğitim yenileme aralıkları,
   ilkyardımcı oranları, periyodik muayene sıklıkları) 6331 sayılı Kanun ve ilgili
